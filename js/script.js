@@ -1,18 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
     const inventory = document.getElementById("inventory");
     const import_contract = document.getElementById("import_contract");
-    const ctn1 = document.getElementById("container1");
-    const ctn2 = document.getElementById("container2");
+    const provider = document.getElementById("provider");
+    // const ctn1 = document.getElementById("container1");
+    // const ctn2 = document.getElementById("container2");
+    // const ctn3 = document.getElementById("container3");
     const addItemBtn = document.getElementById("addItemBtn");
     const addOrderBtn = document.getElementById("addOrderBtn");
     const addItemForm = document.getElementById("addItemForm");
     const addOrderForm = document.getElementById("addOrderForm");
     const editItemForm = document.getElementById("editItemForm");
     const resetBtn = document.getElementById("resetBtn");
-    const submitBtn = document.getElementById("submitBtn");
-    const imageInput = document.getElementById("image");
-    const editImageInput = document.getElementById("editImage");
-    const previewImage = document.getElementById("previewImage");
+    // const submitBtn = document.getElementById("submitBtn");
+    // const imageInput = document.getElementById("image");
+    // const editImageInput = document.getElementById("editImage");
+    // const previewImage = document.getElementById("previewImage");
     const overlay = document.getElementById("overlay");
 
     // function showForm(form) {
@@ -29,19 +31,32 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentEditingRow = null;
     let currentImageUrl = "default.png";
 
-    inventory.addEventListener("click", function(){
-        ctn1.style.display = "block";
-        ctn2.style.display = "none";
-        inventory.style.backgroundColor = "#e74c3c";
-        import_contract.style.backgroundColor = "#2c3e50";
-    });
+    // inventory.addEventListener("click", function(){
+    //     // ctn1.style.display = "block";
+    //     // ctn2.style.display = "none";
+    //     // ctn3.style.display = "none";
+    //     inventory.style.backgroundColor = "#e74c3c";
+    //     import_contract.style.backgroundColor = "#2c3e50";
+    //     provider.style.backgroundColor = "#2c3e50";
+    // });
 
-    import_contract.addEventListener("click", function(){
-        ctn1.style.display = "none";
-        ctn2.style.display = "block";
-        inventory.style.backgroundColor = "#2c3e50";
-        import_contract.style.backgroundColor = "#e74c3c";
-    });
+    // import_contract.addEventListener("click", function(){
+    //     // ctn1.style.display = "none";
+    //     // ctn2.style.display = "block";
+    //     // ctn3.style.display = "none";
+    //     inventory.style.backgroundColor = "#2c3e50";
+    //     import_contract.style.backgroundColor = "#e74c3c";
+    //     provider.style.backgroundColor = "#2c3e50";
+    // });
+
+    // provider.addEventListener("click", function(){
+    //     // ctn1.style.display = "none";
+    //     // ctn2.style.display = "none";
+    //     // ctn3.style.display = "block";
+    //     inventory.style.backgroundColor = "#2c3e50";
+    //     import_contract.style.backgroundColor = "#2c3e50";
+    //     provider.style.backgroundColor = "#e74c3c";
+    // })
 
     // Ẩn form khi tải trang
     addItemForm.style.display = "none";
@@ -67,13 +82,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Ẩn form khi nhấn nút đóng
-    closeFormBtn1.addEventListener("click", function () {
-        // hideForm(addItemForm);
-        addItemForm.style.display = "none";
+    // // Ẩn form khi nhấn nút đóng
+    // closeFormBtn1.addEventListener("click", function () {
+    //     // hideForm(addItemForm);
+    //     addItemForm.style.display = "none";
 
-        document.body.classList.remove("disable-scroll");
-    });
+    //     document.body.classList.remove("disable-scroll");
+    // });
 
     closeOrderForm.addEventListener("click", function () {
         // hideForm(addOrderForm);
@@ -88,10 +103,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.body.classList.remove('editing');
     });
 
-    closeEditFormBtn.addEventListener("click", function(){
-        editItemForm.style.display = "none"
-        document.body.classList.remove('editing');
-    })
+    // closeEditFormBtn.addEventListener("click", function(){
+    //     editItemForm.style.display = "none"
+    //     document.body.classList.remove('editing');
+    // })
 
     // Reset form nhập liệu
     resetBtn.addEventListener("click", function () {
@@ -114,77 +129,77 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Thêm dữ liệu vào bảng khi nhấn nút "Thêm"
-    submitBtn.addEventListener("click", function () {
-        const name = document.getElementById("name").value.trim();
-        const id = document.getElementById("id").value.trim();
-        const category = document.getElementById("category").value.trim();
-        const quantity = document.getElementById("quantity").value.trim();
-        const file = imageInput.files[0];
+    // submitBtn.addEventListener("click", function () {
+    //     const name = document.getElementById("name").value.trim();
+    //     const id = document.getElementById("id").value.trim();
+    //     const category = document.getElementById("category").value.trim();
+    //     const quantity = document.getElementById("quantity").value.trim();
+    //     const file = imageInput.files[0];
 
-        if (!name || !id || !category || !quantity) {
-            alert("Vui lòng nhập đầy đủ thông tin!");
-            return;
-        }
+    //     if (!name || !id || !category || !quantity) {
+    //         alert("Vui lòng nhập đầy đủ thông tin!");
+    //         return;
+    //     }
 
-        let imageUrl = "default.png";
-        if (file) {
-            imageUrl = URL.createObjectURL(file);
-        }
+    //     let imageUrl = "default.png";
+    //     if (file) {
+    //         imageUrl = URL.createObjectURL(file);
+    //     }
 
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td>${id}</td>
-            <td><img src="${imageUrl}" alt="Hình ảnh" class="item-img""></td>
-            <td>${name}</td>
-            <td>${category}</td>
-            <td>${quantity}</td>
-            <td>
-                <button id="edit-btn" class="edit-btn">Chỉnh sửa</button>
-                <button id="delete-btn" class="delete-btn">Xóa</button>
-            </td>
-        `;
+    //     const newRow = document.createElement("tr");
+    //     newRow.innerHTML = `
+    //         <td>${id}</td>
+    //         <td><img src="${imageUrl}" alt="Hình ảnh" class="item-img""></td>
+    //         <td>${name}</td>
+    //         <td>${category}</td>
+    //         <td>${quantity}</td>
+    //         <td>
+    //             <button id="edit-btn" class="edit-btn">Chỉnh sửa</button>
+    //             <button id="delete-btn" class="delete-btn">Xóa</button>
+    //         </td>
+    //     `;
 
-        // Thêm sự kiện xóa cho nút "Xóa" mới
-        newRow.querySelector(".delete-btn").addEventListener("click", function () {
-            if(!document.body.classList.contains('editing')){
-                newRow.remove();
-            }
-        });
+    //     // Thêm sự kiện xóa cho nút "Xóa" mới
+    //     newRow.querySelector(".delete-btn").addEventListener("click", function () {
+    //         if(!document.body.classList.contains('editing')){
+    //             newRow.remove();
+    //         }
+    //     });
 
-         // Chỉnh sửa
-         newRow.querySelector(".edit-btn").addEventListener("click", function () {
-            if (!document.body.classList.contains('editing')) {
-                // Sử dụng let để cho phép cập nhật giá trị
-                let currentId = newRow.cells[0].innerText;
-                let currentImage = newRow.cells[1].querySelector('img').src;
-                let currentName = newRow.cells[2].innerText;
-                let currentCategory = newRow.cells[3].innerText;
-                let currentQuantity = newRow.cells[4].innerText;
+    //      // Chỉnh sửa
+    //      newRow.querySelector(".edit-btn").addEventListener("click", function () {
+    //         if (!document.body.classList.contains('editing')) {
+    //             // Sử dụng let để cho phép cập nhật giá trị
+    //             let currentId = newRow.cells[0].innerText;
+    //             let currentImage = newRow.cells[1].querySelector('img').src;
+    //             let currentName = newRow.cells[2].innerText;
+    //             let currentCategory = newRow.cells[3].innerText;
+    //             let currentQuantity = newRow.cells[4].innerText;
         
-                // Đưa dữ liệu mới nhất vào form chỉnh sửa
-                document.getElementById("editID").value = currentId;
-                document.getElementById("editName").value = currentName;
-                document.getElementById("editCategory").value = currentCategory;
-                document.getElementById("editQuantity").value = currentQuantity;
-                previewImage.src = currentImage;
-                currentImageUrl = currentImage;
+    //             // Đưa dữ liệu mới nhất vào form chỉnh sửa
+    //             document.getElementById("editID").value = currentId;
+    //             document.getElementById("editName").value = currentName;
+    //             document.getElementById("editCategory").value = currentCategory;
+    //             document.getElementById("editQuantity").value = currentQuantity;
+    //             previewImage.src = currentImage;
+    //             currentImageUrl = currentImage;
         
-                currentEditingRow = newRow;
-                document.body.classList.add('editing');
-                editItemForm.style.display = "block";
-                editItemForm.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-        });
+    //             currentEditingRow = newRow;
+    //             document.body.classList.add('editing');
+    //             editItemForm.style.display = "block";
+    //             editItemForm.scrollIntoView({ behavior: "smooth", block: "center" });
+    //         }
+    //     });
         
         
         
-        const tableBody1 = document.querySelector("#itemTable tbody");
-        tableBody1.insertBefore(newRow, tableBody1.firstChild);
+    //     const tableBody1 = document.querySelector("#itemTable tbody");
+    //     tableBody1.insertBefore(newRow, tableBody1.firstChild);
         
-        addItemForm.style.display = "none";
-        document.body.classList.remove("disable-scroll");
-        resetBtn.click();
-    });
+    //     addItemForm.style.display = "none";
+    //     document.body.classList.remove("disable-scroll");
+    //     resetBtn.click();
+    // });
 
     // Hiển thị ảnh xem trước khi chọn ảnh mới
     editImageInput.addEventListener("change", function () {
@@ -195,30 +210,30 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Lưu chỉnh sửa
-    document.getElementById("saveEditBtn").addEventListener("click", function () {
-        const editedName = document.getElementById("editName").value.trim();
-        const editedCategory = document.getElementById("editCategory").value.trim();
-        const editedQuantity = document.getElementById("editQuantity").value.trim();
-        const newFile = editImageInput.files[0];
-        const newImageUrl = newFile ? URL.createObjectURL(newFile) : currentImageUrl;
+    // document.getElementById("saveEditBtn").addEventListener("click", function () {
+    //     const editedName = document.getElementById("editName").value.trim();
+    //     const editedCategory = document.getElementById("editCategory").value.trim();
+    //     const editedQuantity = document.getElementById("editQuantity").value.trim();
+    //     const newFile = editImageInput.files[0];
+    //     const newImageUrl = newFile ? URL.createObjectURL(newFile) : currentImageUrl;
 
-        if (currentEditingRow) {
-            currentEditingRow.cells[2].innerText = editedName;
-            currentEditingRow.cells[3].innerText = editedCategory;
-            currentEditingRow.cells[4].innerText = editedQuantity;
-            currentEditingRow.cells[1].querySelector('img').src = newImageUrl;
-        }
+    //     if (currentEditingRow) {
+    //         currentEditingRow.cells[2].innerText = editedName;
+    //         currentEditingRow.cells[3].innerText = editedCategory;
+    //         currentEditingRow.cells[4].innerText = editedQuantity;
+    //         currentEditingRow.cells[1].querySelector('img').src = newImageUrl;
+    //     }
 
-        editItemForm.style.display = "none";
-        overlay.style.display = "none";
-        document.body.classList.remove('editing');
-    });
+    //     editItemForm.style.display = "none";
+    //     overlay.style.display = "none";
+    //     document.body.classList.remove('editing');
+    // });
 
     // Hủy chỉnh sửa
-    document.getElementById("cancelEditBtn").addEventListener("click", function () {
-        editItemForm.style.display = "none";
-        document.body.classList.remove('editing');
-    });
+    // document.getElementById("cancelEditBtn").addEventListener("click", function () {
+    //     editItemForm.style.display = "none";
+    //     document.body.classList.remove('editing');
+    // });
 
     document.getElementById("submitOrder").addEventListener("click", function () {
         const orderId = document.getElementById("orderId").value.trim();

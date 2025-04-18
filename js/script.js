@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const addItemForm = document.getElementById("addItemForm");
     const addOrderForm = document.getElementById("addOrderForm");
     const editItemForm = document.getElementById("editItemForm");
+    const addProviderForm = document.getElementById("addProviderForm");
     const resetBtn = document.getElementById("resetBtn");
     // const submitBtn = document.getElementById("submitBtn");
     // const imageInput = document.getElementById("image");
@@ -62,15 +63,15 @@ document.addEventListener("DOMContentLoaded", function () {
     addItemForm.style.display = "none";
 
      // Hiển thị form
-    addItemBtn.addEventListener("click", function () {
-        if (!document.body.classList.contains('editing')) {
-            // showForm(addItemForm);
-            addItemForm.style.display = "block";
-            addItemForm.scrollIntoView({ behavior: "smooth", block: "center" });
+    // addItemBtn.addEventListener("click", function () {
+    //     if (!document.body.classList.contains('editing')) {
+    //         // showForm(addItemForm);
+    //         addItemForm.style.display = "block";
+    //         addItemForm.scrollIntoView({ behavior: "smooth", block: "center" });
 
-            document.body.classList.add("disable-scroll");
-        }
-    });
+    //         document.body.classList.add("disable-scroll");
+    //     }
+    // });
 
     addOrderBtn.addEventListener("click", function () {
         if (!document.body.classList.contains("editing")) {

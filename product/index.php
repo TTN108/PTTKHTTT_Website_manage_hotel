@@ -24,7 +24,7 @@
         </a>
         <a href="index.php?tab=provider">
             <button id="provider" class="tab">
-                <i class="fa-solid fa-box-open"></i>
+                <i class="fa-solid fa-image-portrait"></i>
                 <span class="text">Nhà cung cấp</span>
             </button>
         </a>

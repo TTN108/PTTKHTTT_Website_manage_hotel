@@ -260,9 +260,9 @@
             alert("Vui lòng điền đầy đủ thông tin");
             return false;
         }
-        const regex = /^DD/;
+        const regex = /^DD[0-9]{3}$/;
         if(!regex.test(id.value)){
-            alert("Mã đồ dùng phải bắt đầu bằng DD");
+            alert("Mã đồ dùng phải bắt đầu bằng DD và sau đó chỉ có 3 chữ số");
             id.focus();
             return false;
         }
@@ -275,4 +275,13 @@
         }
         return true;
     }
+    addItemBtn.addEventListener("click", function () {
+        if (!document.body.classList.contains('editing')) {
+            // showForm(addItemForm);
+            addItemForm.style.display = "block";
+            addItemForm.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            document.body.classList.add("disable-scroll");
+        }
+    });
 </script>

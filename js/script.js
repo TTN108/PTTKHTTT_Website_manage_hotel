@@ -73,15 +73,15 @@ document.addEventListener("DOMContentLoaded", function () {
     //     }
     // });
 
-    addOrderBtn.addEventListener("click", function () {
-        if (!document.body.classList.contains("editing")) {
-            // showForm(addOrderForm);
-            addOrderForm.style.display = "block";
-            addOrderForm.scrollIntoView({ behavior: "smooth", block: "center" });
+    // addOrderBtn.addEventListener("click", function () {
+    //     if (!document.body.classList.contains("editing")) {
+    //         // showForm(addOrderForm);
+    //         addOrderForm.style.display = "block";
+    //         addOrderForm.scrollIntoView({ behavior: "smooth", block: "center" });
 
-            document.body.classList.add("disable-scroll");
-        }
-    });
+    //         document.body.classList.add("disable-scroll");
+    //     }
+    // });
 
     // // Ẩn form khi nhấn nút đóng
     // closeFormBtn1.addEventListener("click", function () {
@@ -91,12 +91,12 @@ document.addEventListener("DOMContentLoaded", function () {
     //     document.body.classList.remove("disable-scroll");
     // });
 
-    closeOrderForm.addEventListener("click", function () {
-        // hideForm(addOrderForm);
-        addOrderForm.style.display = "none";
+    // closeOrderForm.addEventListener("click", function () {
+    //     // hideForm(addOrderForm);
+    //     addOrderForm.style.display = "none";
 
-        document.body.classList.remove("disable-scroll");
-    });
+    //     document.body.classList.remove("disable-scroll");
+    // });
 
     // Ẩn overlay khi chỉnh sửa xong
     document.getElementById("saveEditBtn").addEventListener("click", function () {

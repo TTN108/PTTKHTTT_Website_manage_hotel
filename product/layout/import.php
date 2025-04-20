@@ -159,6 +159,10 @@
                 alert("Không có mã đồ dùng này tồn tại");
                 return false;
             }
+            if(line1.length < 3){
+                alert("Phải có mã đồ dùng - số lượng - tiền nhập");
+                return false;
+            }
             // for(var j = 0; j < line1.length; j++){
             //     console.log(line1[j].trim());
             // }

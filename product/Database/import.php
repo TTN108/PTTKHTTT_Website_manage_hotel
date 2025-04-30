@@ -78,5 +78,20 @@
                 echo "<script>alert('Không thành công')</script>";
             }
         }
+        function update_product($productID, $quantity){
+            $sql = "SELECT So_luong FROM do_dung WHERE Ma_Do_Dung = '$productID'";
+            $res = mysqli_query($this->con, $sql);
+            while($row = mysqli_fetch_array($res)){
+                $quan = $row[0];
+                $quan += $quantity;
+                $sql1 = "UPDATE `do_dung` SET So_luong = $quan WHERE Ma_Do_Dung = '$productID'";
+                if(mysqli_query($this->con, $sql1)){
+                    return;
+                }
+                else{
+                    echo "<script>alert('Không thành công')</script>";
+                }
+            }
+        }
     }
 ?>

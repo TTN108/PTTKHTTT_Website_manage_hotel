@@ -47,7 +47,7 @@
         <h3>Thêm đơn hàng mới</h3>
         <input type="text" id="orderId" name="orderID" placeholder="Mã đơn hàng: ">
 
-        <textarea id="orderDetail" name="orderDetail" placeholder="Nhập chi tiết đơn hàng..." rows="4"></textarea>
+        <textarea id="orderDetail" name="orderDetail" placeholder="Nhập theo cú pháp mã đồ dùng - số lượng - đơn giá" rows="4"></textarea>
         <input type="date" id="date" name="date">
 
         <input type="text" id="supplier" name="providerID" placeholder="Mã nhà cung cấp:">

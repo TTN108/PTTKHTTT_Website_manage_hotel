@@ -17,6 +17,7 @@
     for($i = 0; $i < sizeof($array); $i++){
         $array1 = preg_split("/-/", $array[$i]);
         $import->insert_detail($orderId, $array1[0].trim(" "), (int)$array1[1].trim(" "), (int)$array1[2].trim(" "));
+        $import->update_product($array1[0].trim(" "), (int)$array1[1].trim(" "));
     }
     $import->close();
 ?>

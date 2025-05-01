@@ -65,6 +65,7 @@
                 }
             }
         }
+
         function update_employee($id, $name, $phone, $address){
             $sql = "UPDATE nhan_vien SET Ten = '$name', SDT = '$phone', Dia_chi = '$address' WHERE Ma_nhan_vien = '$id'";
             if(mysqli_query($this->con, $sql)){
@@ -74,5 +75,69 @@
                 </script>";
             }
         }
+        
+        function get_customer(){
+            $sql = "SELECT * FROM khach_hang, account where khach_hang.Account = account.Username";
+            $res = mysqli_query($this->con, $sql);
+            $cnt = 0;
+            while($row = mysqli_fetch_array($res)){
+                // print_r($row);
+                $cnt++;
+                echo "
+                <tbody>
+                <td>$row[0]</td>
+                <td>$row[1]</td>
+                <td>$row[2]</td>
+                <td>$row[3]</td>
+                <td>$row[4]</td>
+                <td>$row[6]</td>
+                <td>$row[7]</td>
+                <td>
+                <button id='edit-btn$cnt' class='edit-btn' onclick='update1(this)'>Chỉnh sửa</button>
+                <button id='delete-btn' class='delete-btn'>
+                <a href = 'handle/handle_customer.php?id=$row[0]&username=$row[4]&op=delete'>Xóa</a>
+                </button>
+                </td>
+                </tbody>
+                ";
+            }
+        }
+        function insert_customer($id, $name, $phone, $address, $username, $password, $email){
+            $sql = "INSERT INTO account(Username, Password, Email, Status)
+            values ('$username', '$password', '$email', 'Hoạt động')";
+            if(mysqli_query($this->con, $sql)){
+                $sql1 = "INSERT INTO khach_hang(CCCD, Ten, SDT, Dia_chi, Account)
+                values ('$id', '$name', '$phone', '$address', '$username')";
+                if(mysqli_query($this->con, $sql1)){
+                    echo "<script>
+                    alert('Thêm thành công');
+                    window.location.href = '../admin.php';
+                    </script>";
+                }
+            }
+        }
+
+        function update_customer($id, $name, $phone, $address){
+            $sql = "UPDATE khach_hang SET Ten = '$name', SDT = '$phone', Dia_chi = '$address' WHERE CCCD = '$id'";
+            if(mysqli_query($this->con, $sql)){
+                echo "<script>
+                        alert('Cập nhật thành công');
+                        window.location.href = '../admin.php';
+                </script>";
+            }
+        }
+
+        function del_customer($id, $username){
+            $sql = "DELETE FROM khach_hang WHERE CCCD = '$id'";
+            if(mysqli_query($this->con, $sql)){
+                $sql1 = "DELETE FROM account WHERE Username = '$username'";
+                if(mysqli_query($this->con, $sql1)){
+                    echo "<script>
+                        alert('Xóa thành công');
+                        window.location.href = '../admin.php';
+                    </script>";
+                }
+            }
+        }
     }
-?>
+    ?>

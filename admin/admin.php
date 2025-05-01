@@ -1,6 +1,6 @@
 <?php
-    require("database/account.php");
-    session_start();
+require("database/account.php");
+session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,7 +59,7 @@
             <thead>
                 <tr>
                     <th>CCCD</th>
-                    <th>Tên nhân viên</th>
+                    <th>Tên khách hàng</th>
                     <th>Số điện thoại</th>
                     <th>Địa chỉ</th>
                     <th>Username</th>
@@ -68,11 +68,15 @@
                     <th>Hành động</th>
                 </tr>
             </thead>
-
+            <?php
+            $account = new account();
+            $account->get_customer();
+            $account->close();
+            ?>
         </table>
 
         <form class="add-form" id="addEform" method="get" action="handle/handle_employee.php" onsubmit="return check1()">
-            <h3>Thêm người dùng</h3>
+            <h3>Thêm nhân viên</h3>
             <button type="button" id="closeFormBtn">&times;</button>
             <input type="text" id="id" name="id" placeholder="Mã nhân viên">
             <input type="text" id="fullname" name="fullname" placeholder="Họ và tên">
@@ -91,15 +95,39 @@
             <input type="hidden" name="op" value="add">
             <button type="submit">Submit</button>
         </form>
+        
+        <form class="add-form" id="addCform" method="get" action="handle/handle_customer.php" onsubmit="return check2()">
+            <h3>Thêm khách hàng</h3>
+            <button type="button" id="closeFormBtn1">&times;</button>
+            <input type="text" id="idC" name="id" placeholder="CCCD">
+            <input type="text" id="fullnameC" name="fullname" placeholder="Họ và tên">
+            <input type="text" id="phoneC" name="phone" placeholder="Số điện thoại">
+            <input type="text" id="addressC" name="address" placeholder="Địa chỉ">
+            <input type="text" id="usernameC" name="username" placeholder="Username">
+            <input type="password" id="passwordC" name="password" placeholder="Password">
+            <input type="text" id="emailC" name="email" placeholder="Email">
+            <input type="hidden" name="op" value="add">
+            <button type="submit">Submit</button>
+        </form>
 
         <form class="add-form" id="updateEform" method="get" action="handle/handle_employee.php">
-            <h3>Thêm người dùng</h3>
+            <h3>Sửa thông tin nhân viên</h3>
             <button type="button" id="closeFormBtn2">&times;</button>
             <input type="text" id="id2" name="id" placeholder="Mã nhân viên" readonly>
             <input type="text" id="fullname2" name="fullname" placeholder="Họ và tên">
             <input type="text" id="phone2" name="phone" placeholder="Số điện thoại">
             <input type="text" id="address2" name="address" placeholder="Địa chỉ">
-            <!-- <input type="text" id="email2" name="email" placeholder="Email"> -->
+            <input type="hidden" name="op" value="update">
+            <button type="submit">Submit</button>
+        </form>
+
+        <form class="add-form" id="updateCform" method="get" action="handle/handle_customer.php">
+            <h3>Sửa thông tin khách hàng</h3>
+            <button type="button" id="closeFormBtn3">&times;</button>
+            <input type="text" id="idUC" name="id" placeholder="CCCD" readonly>
+            <input type="text" id="fullnameUC" name="fullname" placeholder="Họ và tên">
+            <input type="text" id="phoneUC" name="phone" placeholder="Số điện thoại">
+            <input type="text" id="addressUC" name="address" placeholder="Địa chỉ">
             <input type="hidden" name="op" value="update">
             <button type="submit">Submit</button>
         </form>
@@ -156,51 +184,71 @@
     <!-- File JS chính -->
     <!-- <script src="../js/admin.js"></script> -->
     <?php
-    if ($_SESSION['user']) {
-        echo "<script>
-                document.getElementsByClassName('login-container')[0].style.display = 'none';
-                document.getElementsByClassName('admin-panel')[0].style.display = 'block';
-            </script>";
-    } else {
-        echo "<script>
-                document.getElementsByClassName('login-container')[0].style.display = 'flex';
-                document.getElementsByClassName('admin-panel')[0].style.display = 'none';
-            </script>";
-    }
-    $account = new account();
-    $acc = array();
-    $pass = array();
-    $job = array();
-    $sql = "SELECT account.Username, account.Password, nhan_vien.Chuc_vu FROM account, nhan_vien WHERE account.Username = nhan_vien.Account";
-    $res = mysqli_query($account->getConnect(), $sql);
-    while ($row = mysqli_fetch_array($res)) {
-        $acc[] = $row[0];
-        $pass[] = $row[1];
-        $job[] = $row[2];
-    }
-    $account->close();
+        if ($_SESSION['user']) {
+            echo "<script>
+                    document.getElementsByClassName('login-container')[0].style.display = 'none';
+                    document.getElementsByClassName('admin-panel')[0].style.display = 'block';
+                </script>";
+        } else {
+            echo "<script>
+                    document.getElementsByClassName('login-container')[0].style.display = 'flex';
+                    document.getElementsByClassName('admin-panel')[0].style.display = 'none';
+                </script>";
+        }
+        $account = new account();
+        $acc = array();
+        $pass = array();
+        $job = array();
+        $sql = "SELECT account.Username, account.Password, nhan_vien.Chuc_vu FROM account, nhan_vien WHERE account.Username = nhan_vien.Account";
+        $res = mysqli_query($account->getConnect(), $sql);
+        while ($row = mysqli_fetch_array($res)) {
+            $acc[] = $row[0];
+            $pass[] = $row[1];
+            $job[] = $row[2];
+        }
+        $account->close();
     ?>
     <?php
-    $account1 = new account();
-    $id = array();
-    $sql1 = "SELECT Ma_nhan_vien FROM nhan_vien";
-    $res1 = mysqli_query($account1->getConnect(), $sql1);
-    // print_r($res1);
-    while ($row1 = mysqli_fetch_array($res1)) {
-        // print_r($row1);
-        $id[] = $row1[0];
-    }
-    $acc1 = array();
-    $sql2 = "SELECT Username FROM account";
-    $res2 = mysqli_query($account1->getConnect(), $sql2);
-    while ($row2 = mysqli_fetch_array($res2)) {
-        $acc1[] = $row2[0];
-    }
-    $account1->close();
+        $account1 = new account();
+        $id = array();
+        $sql1 = "SELECT Ma_nhan_vien FROM nhan_vien";
+        $res1 = mysqli_query($account1->getConnect(), $sql1);
+        // print_r($res1);
+        while ($row1 = mysqli_fetch_array($res1)) {
+            // print_r($row1);
+            $id[] = $row1[0];
+        }
+        $acc1 = array();
+        $sql2 = "SELECT Username FROM account";
+        $res2 = mysqli_query($account1->getConnect(), $sql2);
+        while ($row2 = mysqli_fetch_array($res2)) {
+            $acc1[] = $row2[0];
+        }
+        $account1->close();
+    ?>
+    <?php
+        $account1 = new account();
+        $id = array();
+        $sql1 = "SELECT CCCD FROM khach_hang";
+        $res1 = mysqli_query($account1->getConnect(), $sql1);
+        // print_r($res1);
+        while ($row1 = mysqli_fetch_array($res1)) {
+            // print_r($row1);
+            $id[] = $row1[0];
+        }
+        $acc1 = array();
+        $sql2 = "SELECT Username FROM account";
+        $res2 = mysqli_query($account1->getConnect(), $sql2);
+        while ($row2 = mysqli_fetch_array($res2)) {
+            $acc1[] = $row2[0];
+        }
+        $account1->close();
     ?>
     <script>
         addEform.style.display = "none";
+        addCform.style.display = "none";
         updateEform.style.display = "none";
+        updateCform.style.display = "none";
 
         function check() {
             var username = document.getElementById("username");
@@ -228,15 +276,24 @@
         addEmployeeBtn.addEventListener("click", function() {
             addEform.style.display = "block";
         })
+        addCustomerBtn.addEventListener("click", function() {
+            addCform.style.display = "block";
+        })
         closeFormBtn.addEventListener("click", function() {
             addEform.style.display = "none";
+        })
+        closeFormBtn1.addEventListener("click", function() {
+            addCform.style.display = "none";
         })
         closeFormBtn2.addEventListener("click", function() {
             updateEform.style.display = "none";
         })
+        closeFormBtn3.addEventListener("click", function() {
+            updateCform.style.display = "none";
+        })
 
         function check1() {
-            alert("Hello World");
+            // alert("Hello World");
             var id = document.getElementById("id");
             var ids = <?php echo json_encode($id) ?>;
             var username = document.getElementById("username1");
@@ -278,6 +335,48 @@
             return true;
         }
 
+        function check2() {
+            var id = document.getElementById("idC");
+            var ids = <?php echo json_encode($id) ?>;
+            var username = document.getElementById("usernameC");
+            var acc = <?php echo json_encode($acc1) ?>;
+            var email = document.getElementById("emailC");
+            var name = document.getElementById("fullnameC");
+            var phone = document.getElementById("phoneC");
+            var address = document.getElementById("addressC");
+            var pass = document.getElementById("passwordC");
+            if (!id.value || !username.value || !email.value || !name.value || !phone.value || !address.value || !pass.value) {
+                alert("Vui lòng điền đầy đủ thông tin");
+            }
+            const regex = /^[0-9]{12}$/;
+            if (!regex.test(id.value)) {
+                alert("CCCD phải có đủ 12 chữ số");
+                id.focus();
+                return false;
+            }
+            for (var i = 0; i < ids.length; i++) {
+                if (id.value == ids[i]) {
+                    alert("CCCD bị trùng");
+                    id.focus();
+                    return false;
+                }
+            }
+            for (var i = 0; i < acc.length; i++) {
+                if (username.value == acc[i]) {
+                    alert("Đã có tài khoản này rồi");
+                    username.focus();
+                    return false;
+                }
+            }
+            const regex1 = /@gmail.com$/;
+            if (!regex1.test(email.value)) {
+                alert("Email phải có @gmail.com đằng sau");
+                email.focus();
+                return false;
+            }
+            return true;
+        }
+
         function update(element) {
             updateEform.style.display = "block";
             let tmp = element.parentNode.parentNode;
@@ -287,6 +386,17 @@
             document.getElementById("fullname2").value = td[1].innerHTML;
             document.getElementById("phone2").value = td[2].innerHTML;
             document.getElementById("address2").value = td[3].innerHTML;
+        }
+
+        function update1(element) {
+            updateCform.style.display = "block";
+            let tmp = element.parentNode.parentNode;
+            let td = tmp.querySelectorAll('td');
+            console.log(td);
+            document.getElementById("idUC").value = td[0].innerHTML;
+            document.getElementById("fullnameUC").value = td[1].innerHTML;
+            document.getElementById("phoneUC").value = td[2].innerHTML;
+            document.getElementById("addressUC").value = td[3].innerHTML;
         }
     </script>
 </body>

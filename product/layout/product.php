@@ -284,4 +284,19 @@
             document.body.classList.add("disable-scroll");
         }
     });
+    document.getElementById("searchBtn").addEventListener("click", function() {
+    let keyword = document.getElementById("searchInput").value.toLowerCase();
+    let table = document.getElementById("itemTable");
+    let tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) { // Bỏ qua dòng tiêu đề
+        let name = tr[i].getElementsByTagName("td")[1]?.textContent.toLowerCase();
+        let id = tr[i].getElementsByTagName("td")[0]?.textContent.toLowerCase();
+        if (name.includes(keyword) || id.includes(keyword)) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+});
 </script>

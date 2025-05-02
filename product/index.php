@@ -1,3 +1,6 @@
+<?php 
+    session_start(); 
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -9,6 +12,16 @@
 </head>
 
 <body>
+    <form class="login-container" onsubmit="return check()" method="get" action="handle/login.php">
+        <div class="background-image">
+            <div class="login-form">
+                <h2>Login</h2>
+                <input type="text" id="username" name="username" placeholder="Username">
+                <input type="password" id="password" name="password" placeholder="Password">
+                <button type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
 
     <div class="sidebar">
         <button class="menu-toggle">☰</button>
@@ -26,6 +39,12 @@
             <button id="provider" class="tab">
                 <i class="fa-solid fa-image-portrait"></i>
                 <span class="text">Nhà cung cấp</span>
+            </button>
+        </a>
+        <a href="handle/logout.php">
+            <button id="provider" class="tab" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="text">Đăng xuất</span>
             </button>
         </a>
     </div>
@@ -51,6 +70,63 @@
     ?>
 
     <script src="../js/script.js"></script>
+    <?php
+        if(@$_SESSION["user"]){
+            echo "<script>
+                    document.getElementsByClassName('login-container')[0].style.display = 'none';
+                    document.getElementsByClassName('sidebar')[0].style.display = 'block';
+                    document.getElementsByClassName('container1')[0].style.display = 'block';
+                    document.getElementsByClassName('container2')[0].style.display = 'block';
+                    document.getElementsByClassName('container3')[0].style.display = 'block';
+            </script>";
+        }
+        else{
+            echo "<script>
+                    document.getElementsByClassName('login-container')[0].style.display = 'flex';
+                    document.getElementsByClassName('sidebar')[0].style.display = 'none';
+                    document.getElementsByClassName('container1')[0].style.display = 'none';
+                    document.getElementsByClassName('container2')[0].style.display = 'none';
+                    document.getElementsByClassName('container3')[0].style.display = 'none';
+            </script>";
+        }
+        $con = mysqli_connect("localhost", "root", "", "hotel");
+        $acc = array();
+        $pass = array();
+        $job = array();
+        $sql = "SELECT account.Username, account.Password, nhan_vien.Chuc_vu FROM account, nhan_vien WHERE account.Username = nhan_vien.Account";
+        $res = mysqli_query($con, $sql);
+        while ($row = mysqli_fetch_array($res)) {
+            $acc[] = $row[0];
+            $pass[] = $row[1];
+            $job[] = $row[2];
+        }
+        mysqli_close($con);
+    ?>
+
+    <script>
+        function check() {
+            var username = document.getElementById("username");
+            var password = document.getElementById("password");
+            var users = <?php echo json_encode($acc) ?>;
+            var passes = <?php echo json_encode($pass) ?>;
+            var job = <?php echo json_encode($job) ?>;
+            if (!username.value || !password.value) {
+                alert("Vui lòng nhập đầy đủ!");
+                return false;
+            }
+            for (var i = 0; i < users.length; i++) {
+                if (username.value == users[i] && password.value == passes[i] && (job[i] == "Chủ doanh nghiệp" || job[i] == "Quản lý")) {
+                    return true;
+                }
+            }
+            alert("Đang sai tài khoản hoặc mật khẩu hoặc bạn không phải là chủ doanh nghiệp hoặc quản lý kho");
+            return false;
+        }
+        function logout() {
+            alert("Bạn đang đăng xuất");
+            window.location.href = "handle/logout.php";
+        }
+    </script>
 
 </body>
 

@@ -275,9 +275,15 @@ session_start();
         }
         addEmployeeBtn.addEventListener("click", function() {
             addEform.style.display = "block";
+            addCform.style.display = "none";
+            updateCform.style.display = "none";
+            updateEform.style.display = "none";
         })
         addCustomerBtn.addEventListener("click", function() {
             addCform.style.display = "block";
+            addEform.style.display = "none";
+            updateCform.style.display = "none";
+            updateEform.style.display = "none";
         })
         closeFormBtn.addEventListener("click", function() {
             addEform.style.display = "none";
@@ -379,6 +385,9 @@ session_start();
 
         function update(element) {
             updateEform.style.display = "block";
+            updateCform.style.display = "none";
+            addCform.style.display = "none";
+            addEform.style.display = "none";
             let tmp = element.parentNode.parentNode;
             let td = tmp.querySelectorAll('td');
             console.log(td);
@@ -390,6 +399,9 @@ session_start();
 
         function update1(element) {
             updateCform.style.display = "block";
+            updateEform.style.display = "none";
+            addCform.style.display = "none";
+            addEform.style.display = "none";
             let tmp = element.parentNode.parentNode;
             let td = tmp.querySelectorAll('td');
             console.log(td);

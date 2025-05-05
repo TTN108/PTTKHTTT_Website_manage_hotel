@@ -125,7 +125,6 @@
         let orderDetail = document.getElementById("orderDetail");
         let date = document.getElementById("date");
         let supplier = document.getElementById("supplier");
-        alert(supplier.value);
         let provided = document.getElementById("provided");
         let not_provided = document.getElementById("not_provided");
         let orderID = <?php echo json_encode($importIDs)?>;

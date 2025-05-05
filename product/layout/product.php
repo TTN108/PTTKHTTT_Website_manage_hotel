@@ -50,7 +50,7 @@
         </table>
     </div>
 
-    <form id="addItemForm" class="form-container" method="get" action="../../product/handle/handle_product.php" onsubmit="return check()">
+    <form id="addItemForm" class="form-container" method="get" action="../../product/handle/handle_product.php" onsubmit="return check1()">
         <button type="button" id="closeFormBtn1" class="close-btn">&times;</button>
         <h3>Thêm dụng cụ</h3>
         <input type="hidden" name="op" value="insert">
@@ -248,7 +248,7 @@
         document.getElementById("editQuantity").value = td[4].innerHTML;
         // alert(element.parentNode.parentNode.id);
     }
-    function check(){
+    function check1(){
         let name = document.getElementById("name");
         let id = document.getElementById("id");
         let category = document.getElementById("category");

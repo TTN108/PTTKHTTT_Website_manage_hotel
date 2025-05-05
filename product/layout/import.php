@@ -42,10 +42,10 @@
         </table>
     </div>
 
-    <form id="addOrderForm" class="form-container" onsubmit="return check()" method="get" action="../../product/handle/handle_import.php">
+    <form id="addOrderForm" class="form-container" onsubmit="return check1()" method="get" action="../../product/handle/handle_import.php">
         <button type="button" id="closeOrderForm" class="close-btn">&times;</button>
         <h3>Thêm đơn hàng mới</h3>
-        <input type="text" id="orderId" name="orderID" placeholder="Mã đơn hàng: ">
+        <!-- <input type="text" id="orderId" name="orderID" placeholder="Mã đơn hàng: "> -->
 
         <textarea id="orderDetail" name="orderDetail" placeholder="Nhập theo cú pháp mã đồ dùng - số lượng - đơn giá" rows="4"></textarea>
         <input type="date" id="date" name="date">
@@ -121,23 +121,18 @@
             radio1.disabled = true;
         }
     }
-    function check(){
-        let order = document.getElementById("orderId");
+    function check1(){
         let orderDetail = document.getElementById("orderDetail");
         let date = document.getElementById("date");
         let supplier = document.getElementById("supplier");
+        alert(supplier.value);
         let provided = document.getElementById("provided");
         let not_provided = document.getElementById("not_provided");
         let orderID = <?php echo json_encode($importIDs)?>;
         let productID = <?php echo json_encode($productIDs)?>;
         let providerID = <?php echo json_encode($providerIDs)?>;
-        if(!order.value || !orderDetail.value || !date.value || !supplier.value || (provided.checked == false && not_provided.checked == false)){
+        if(!orderDetail.value || !date.value || !supplier.value || (provided.check == false && not_provided.check == false)){
             alert("Vui lòng điền đầy đủ thông tin");
-            return false;
-        }
-        const regex = /^NH[0-9]{3}$/;
-        if(!regex.test(order.value)){
-            alert("Mã phiếu nhập bắt đầu là NH và đằng sau là 3 chữ số");
             return false;
         }
         let line = orderDetail.value.split(/\r?\n|\r|\n/g);
@@ -149,14 +144,16 @@
                 return false;
             }
             var check = false;
+            var tmp;
             for(var i = 0; i < productID.length; i++){
+                tmp = line1[0].trim();
                 if(line1[0].trim() == productID[i]){
                     check = true;
                     break;
                 }
             }
             if(!check){
-                alert("Không có mã đồ dùng này tồn tại");
+                alert("Không có mã đồ dùng " + tmp + " này tồn tại");
                 return false;
             }
             if(line1.length < 3){
@@ -171,13 +168,6 @@
         if(!regex2.test(supplier.value)){
             alert("Mã nhà cung cấp phải bắt đầu NCC và sau đó chỉ có 3 chữ số");
             return false;
-        }
-        for(var i = 0; i < orderID.length; i++){
-            if(orderID[0] == order.value){
-                alert("Đã có mã nhập hàng rồi");
-                order.focus();
-                return false;
-            }
         }
         var check = false;
         for(var i = 0; i < providerID.length; i++){

@@ -37,7 +37,7 @@
         </table>
     </div>
 
-    <form id="addProviderForm" class="form-container" onsubmit="return check()" method="get" action="../../product/handle/handle_provider.php">
+    <form id="addProviderForm" class="form-container" onsubmit="return check1()" method="get" action="../../product/handle/handle_provider.php">
         <button type="button" id="closeFormBtn1" class="close-btn">&times;</button>
         <h3>Thêm nhà cung cấp</h3>
         <input type="hidden" name="op" value="insert">
@@ -130,7 +130,7 @@
         document.getElementById("editAddress").value = td[2].innerHTML;
         document.getElementById("editPhone").value = td[3].innerHTML;
     }
-    function check(){
+    function check1(){
         let name = document.getElementById("name");
         let id = document.getElementById("id");
         let address = document.getElementById("address");

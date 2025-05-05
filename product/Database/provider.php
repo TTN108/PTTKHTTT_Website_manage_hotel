@@ -2,7 +2,7 @@
     class provider{
         private $con;
         function __construct(){
-            $this->con = mysqli_connect("localhost", "root", "", "qlks");
+            $this->con = mysqli_connect("localhost", "root", "", "hotel");
         }
         function getConnect(){
             return $this->con;

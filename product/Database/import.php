@@ -2,7 +2,7 @@
     class import{
         private $con;
         function __construct(){
-            $this->con = mysqli_connect("localhost", "root", "", "qlks");
+            $this->con = mysqli_connect("localhost", "root", "", "hotel");
         }
         function getConnect(){
             return $this->con;
@@ -18,7 +18,7 @@
             while($row = mysqli_fetch_array($res)){
                 $cnt++;
                 $sql1 = "SELECT * FROM `nhap_hang`, `chi_tiet_phieu_nhap`, `do_dung`
-                WHERE nhap_hang.Ma_Nhap_Hang = chi_tiet_phieu_nhap.Ma_Nhap_Hang and chi_tiet_phieu_nhap.Ma_Do_Dung = do_dung.Ma_Do_Dung and nhap_hang.Ma_Nhap_Hang = '$row[0]'";
+                WHERE nhap_hang.Ma_Nhap_Hang = chi_tiet_phieu_nhap.Ma_Nhap_Hang and chi_tiet_phieu_nhap.Ma_Do_Dung = do_dung.Ma_Do_Dung and nhap_hang.Ma_Nhap_Hang = '$row[0]' ORDER BY nhap_hang.Ma_Nhap_Hang ASC";
                 $res1 = mysqli_query($this->con, $sql1);
                 // print_r($row);
                 // while($row1 = mysqli_fetch_array($res1)){
@@ -55,14 +55,11 @@
             </tbody>";
             }
         }
-        function insert_import($importID, $date, $status, $total, $providerID){
-            $sql = "INSERT INTO `nhap_hang`(Ma_Nhap_Hang, Ngay_cung_cap, Trang_thai, Tong_tien_nhap, Ma_nha_cung_cap)
-            values('$importID', '$date', '$status', '$total', '$providerID')";
+        function insert_import($date, $status, $total, $providerID){
+            $sql = "INSERT INTO `nhap_hang`(Ngay_cung_cap, Trang_thai, Tong_tien_nhap, Ma_nha_cung_cap)
+            values('$date', '$status', '$total', '$providerID')";
             if(mysqli_query($this->con, $sql)){
-                echo "<script>
-                alert('Thêm thành công');
-                window.location.href = '../index.php?tab=import';
-                </script>";
+                return;
             }
             else{
                 echo "<script>alert('Không thành công')</script>";

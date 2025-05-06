@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sơ đồ khách sạn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar bên trái */
+        .sidebar {
+            width: 220px;
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+
+        /* Header */
+        .header {
+            background-color: #bdc3c7;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-left: 220px;
+        }
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header .logout {
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Thanh trạng thái */
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            margin-left: 220px;
+            background-color: #f0f0f0;
+        }
+
+        .status-item {
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-free { background-color: green; }
+        .status-occupied { background-color: red; }
+        .status-cleaning { background-color: gray; }
+        .status-standard { background-color: #ff6666; }
+        .status-deluxe { background-color: #ff9999; }
+
+        /* Sơ đồ khách sạn */
+        .hotel-layout {
+            margin: 20px;
+            margin-left: 220px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .floor {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+        }
+
+        .floor-title {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            background: black;
+            color: white;
+            text-align: center;
+            justify-content: center;
+            vertical-align: middle;
+            width: 100px;
+            height: auto;
+            min-height: 100px;
+        }
+        .room-container{
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+        }
+        .room-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .room {
+            width: calc(33.33% - 4px);
+            height: 200px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            display: block;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            padding-top: 3%;
+            border-radius: 5px;
+            position: relative;
+            margin-right: 2px;
+            cursor: pointer;
+            margin-right: 2px;
+        }
+
+        .room:hover {
+            opacity: 0.9;
+        }
+
+        .room.free { background-color: green; }
+        .room.occupied { background-color: red; }
+        .room.cleaning { background-color: gray; }
+        .room.standard { background-color: #ff6666; }
+        .room.deluxe { background-color: #ff9999; }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 30px;
+            z-index: 10000;
+            background-color: #e0e0e0;
+            color: black;
+            padding: 5px;
+            left: 35%;
+            border-radius: 3px;
+            white-space: nowrap;
+            display: none;
+            cursor: pointer;
+        }
+
+.room:hover .tooltip {
+    display: block;
+}
+
+        .form-container-in {
+            background-color: #ece6e6;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            margin: 10px;
+            position: absolute;
+            margin: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            top: 50px;
+            left: calc(50% - 150px);
+            display: none;
+        }
+        .form-container-out {
+            background-color: #ece6e6;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            margin: 10px;
+            position: absolute;
+            margin: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            top: 50px;
+            left: calc(50% - 150px);
+            display: none;
+        }
+        .form-container-in.active{
+            display: block;
+        }
+        .form-container-out.active{
+            display: block;
+        }
+
+        .form-container-in h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        .form-container-out h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .form-container-in  label {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .form-container-out  label {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .form-container-in input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px 0;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #222;
+            color: white;
+        }
+        .form-container-out input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px 0;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #222;
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .button-group button {
+            padding: 8px 16px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #555;
+            color: white;
+            transition: 0.3s;
+        }
+
+        button:hover {  
+            background-color: #777;
+        }
+
+        .cancel {
+            background-color: #999;
+        }
+
+        .cancel:hover {
+            background-color: #bbb;
+        }
+
+        .confirm {
+            background-color: #007bff;
+        }
+
+        .confirm:hover {
+            background-color: #0056b3;
+        }
+
+        .form-container-in hr {
+            margin: 10px 0;
+            border: 1px solid #666;
+        }
+        .form-container-out hr {
+            margin: 10px 0;
+            border: 1px solid #666;
+        }
+        /* Giao diện Đơn hàng */
+        .order-content {
+            display: none; /* Mặc định ẩn */
+            margin-left: 220px;
+            padding: 20px;
+        }
+        .order-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .order-header label {
+            font-weight: bold;
+        }
+        .order-header input[type='date'] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+        .order-table thead {
+            background-color: #eee;
+        }
+        .order-table th,
+        .order-table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .order-table th {
+            font-weight: bold;
+        }
+        .order-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        .order-table a {
+            margin-right: 8px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .order-table a:hover {
+            text-decoration: underline;
+        }
+        .chart{
+            border: solid 3px red;
+            display: none;
+            margin-left: 220px;
+            padding: 20px;
+        }
+        #mychart{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="#" id="hotelLink">Sơ đồ khách sạn</a>
+        <a href="#" id="orderLink">Đơn hàng</a>
+        <a href="#" id="chartLink">Thống kê</a>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">VNSTT</div>
+        <a href="#" class="logout">Logout</a>
+    </div>
+
+    <!-- Thanh trạng thái -->
+    <div class="status-bar" id="status-bar">
+        <div class="status-item status-free">4 <span>Trống</span></div>
+        <div class="status-item status-occupied">4 <span>Đang ở</span></div>
+        <div class="status-item status-cleaning">4 <span>Chưa dọn</span></div>
+        <div class="status-item status-standard">6 Phòng <span>standard</span></div>
+        <div class="status-item status-deluxe">6 Phòng <span>deluxe</span></div>
+    </div>
+
+    <!-- Sơ đồ khách sạn -->
+    <div class="hotel-layout" id="hotelLayout">
+        <div class="floor">
+            <div class="room-row">
+                <div class="floor-title"><p>Lầu 1</p></div>
+                <div class="room-container">
+                    <div class="room occupied">
+                        <div class="room-title">101</div><br>
+                        <div class="room-owner">Trần Trọng Nghĩa</div>
+                        <div class="tooltip" id="room-event" value="Trả phòng">
+                            Trả Phòng
+                        </div>
+                    </div>
+                    <div class="room free">
+                        <div class="room-title">102</div>
+                        <div class="room-owner"></div>
+                        <div class="tooltip" id="room-event" value="Nhận phòng">
+                            Nhận Phòng
+                        </div>
+                    </div>
+                    <div class="room free">102<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room cleaning">103</div>
+                    <div class="room free">104<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">105<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">106<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">107<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">108<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">109<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">110<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">111<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">112<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                    <div class="room free">113<br>Nhận phòng<div class="tooltip">Nhận phòng</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="floor">
+            <div class="room-row">
+                <div class="floor-title"><span>Lầu 2</span></div>
+                <div class="room free">201</div>
+                <div class="room occupied">202<br>Cao Cát Lượng</div>
+                <div class="room cleaning">203</div>
+            </div>
+        </div>
+        <div class="floor">
+            <div class="room-row">
+                <div class="floor-title">Lầu 3</div>
+                <div class="room cleaning">301</div>
+                <div class="room free">302</div>
+                <div class="room occupied">303<br>Trương Thanh Tòng</div>
+            </div>
+        </div>
+
+        <div class="floor">
+            <div class="room-row">
+                <div class="floor-title">Lầu 4</div>
+                <div class="room occupied">401<br>Trần Trọng Nghĩa<div class="tooltip">Trả phòng</div></div>
+                <div class="room free">402</div>
+                <div class="room free">403</div>
+            </div>
+        </div>
+    </div>
+    <div class="order-content" id="orderContent">
+        <!-- Thanh chọn ngày -->
+        <div class="order-header">
+          <label for="start-date">Ngày</label>
+          <input type="date" id="start-date" />
+          <span>đến</span>
+          <label for="end-date"></label>
+          <input type="date" id="end-date" />
+        </div>
+  
+        <!-- Bảng đơn hàng -->
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th>Họ và tên</th>
+              <th>CCCD</th>
+              <th>Ngày</th>
+              <th>Tính năng</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Nguyễn Văn A</td>
+              <td>123456789</td>
+              <td>2/9/2025</td>
+              <td>
+                <a href="#">Chi tiết</a>
+                <a href="#">Thêm</a>
+                <a href="#">Xóa</a>
+              </td>
+              <td>Chưa xử lý</td>
+            </tr>
+            <tr>
+              <td>Nguyễn Văn B</td>
+              <td>987654321</td>
+              <td>3/9/2025</td>
+              <td>
+                <a href="#">Chi tiết</a>
+                <a href="#">Thêm</a>
+                <a href="#">Xóa</a>
+              </td>
+              <td>Đang xử lý</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    <!-- Form Nhận phòng -->
+    <div class="form-container-in" id="checkin-form">
+        <h2>Thông tin khách hàng</h2>
+        <label>Name*</label>
+        <input type="text" placeholder="Nhập tên khách hàng">
+        
+        <label>ID card*</label>
+        <input type="text" placeholder="Nhập số CMND/CCCD">
+        
+        <label>Email*</label>
+        <input type="email" placeholder="Nhập email">
+        
+        <label>Phone*</label>
+        <input type="text" placeholder="Nhập số điện thoại">
+        
+        <label>Quốc tịch*</label>
+        <input type="text" placeholder="Nhập quốc tịch">
+
+        <div class="button-group">
+            <button class="cancel">Hủy</button>
+            <button class="confirm">Nhận phòng</button>
+        </div>
+    </div>
+
+    <!-- Form Trả phòng -->
+    <div class="form-container-out" id="checkout-form">
+        <h2>Hóa đơn phòng 401</h2>
+        <p>Khách hàng: Trần Trọng Nghĩa</p>
+        <p>Mã HD: HD001</p>
+        <p>Vào lúc: 8:57 27/2/2025</p>
+        <p>Trả lúc: 9:02 28/2/2025</p>
+        <p>Loại phòng: Phòng standard</p>
+        <p>Giá: 500,000</p>
+        <hr>
+        <p>Tiền phòng: 500,000</p>
+        <p>1 ngày (8:57 27/2/2025 - 9:02 28/2/2025)</p>
+        <p>Thanh toán: 500,000</p>
+        <label>Trạng thái:</label>
+        <select>
+            <option>Đang checkin</option>
+            <option>Đã trả phòng</option>
+        </select>
+        <button class="confirm">Trả phòng</button>
+    </div>
+
+    <div class="chart" id="chart">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script src="./data.js"></script>
+    <script>
+        const hotelLink = document.getElementById('hotelLink');
+        const orderLink = document.getElementById('orderLink');
+        const hotelLayout = document.getElementById('hotelLayout');
+        const orderContent = document.getElementById('orderContent');
+        const statusBar = document.getElementById('status-bar');
+
+        // Mặc định hiển thị Sơ đồ khách sạn, ẩn Đơn hàng
+        hotelLayout.style.display = 'block';
+        statusBar.style.display = 'flex';
+        orderContent.style.display = 'none';
+
+        // Khi nhấn 'Sơ đồ khách sạn'
+        hotelLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            hotelLayout.style.display = 'block';
+            statusBar.style.display = 'flex';
+            orderContent.style.display = 'none';
+        });
+
+        // Khi nhấn 'Đơn hàng'
+        orderLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            hotelLayout.style.display = 'none';
+            statusBar.style.display = 'none';
+            orderContent.style.display = 'block';
+        });
+        function closeForms() {
+            document.querySelector('.form-container-in').classList.remove('active');
+            document.querySelector('.form-container-out').classList.remove('active');
+        }
+
+        // Sự kiện cho nút "Hủy" trong các form
+        document.querySelectorAll('.cancel').forEach(button => {
+            button.addEventListener('click', function(e) {
+                closeForms();
+                e.stopPropagation(); // ngăn không cho sự kiện nổi lên document
+            });
+        });
+
+        // Khi click bên ngoài form thì đóng form
+        document.addEventListener('click', function(e) {
+            const checkinForm = document.querySelector('.form-container-in');
+            const checkoutForm = document.querySelector('.form-container-out');
+            // Nếu click không nằm trong form nào thì đóng form
+            if (!checkinForm.contains(e.target) && !checkoutForm.contains(e.target)) {
+                closeForms();
+            }
+        });
+
+        // Ngăn không cho click bên trong form nổi lên để không kích hoạt đóng form
+        document.querySelectorAll('.form-container-in, .form-container-out').forEach(form => {
+            form.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        // Xử lý sự kiện click cho tooltip của phòng
+        const roomEvents = document.querySelectorAll('.tooltip');
+        roomEvents.forEach(roomEvent => {
+            roomEvent.addEventListener('click', function(e) {
+                // Nếu đã có form nào đang mở thì không mở thêm form mới
+                const isCheckinActive = document.querySelector('.form-container-in').classList.contains('active');
+                const isCheckoutActive = document.querySelector('.form-container-out').classList.contains('active');
+                if (isCheckinActive || isCheckoutActive) {
+                    return;
+                }
+
+                // Mở form theo giá trị của tooltip
+                if (roomEvent.getAttribute('value') === 'Trả phòng') {
+                    document.querySelector('.form-container-out').classList.add('active');
+                }
+                if (roomEvent.getAttribute('value') === 'Nhận phòng') {
+                    document.querySelector('.form-container-in').classList.add('active');
+                }
+                e.stopPropagation(); // ngăn sự kiện click không nổi lên document
+            });
+        });
+        // Hàm render Hotel Layout theo cấu trúc yêu cầu
+    function renderHotelLayout() {
+      const hotelLayout = document.getElementById('hotelLayout');
+      hotelLayout.innerHTML = ''; // Xóa nội dung cũ
+
+      // Nhóm các phòng theo tầng (dựa trên ký tự đầu của roomId)
+      const floors = {};
+      rooms.forEach(room => {
+        // Lấy ký tự đầu tiên của roomId, ví dụ "101" → '1'
+        const floorNum = String(room.roomId)[0];
+        if (!floors[floorNum]) {
+          floors[floorNum] = [];
+        }
+        floors[floorNum].push(room);
+      });
+
+      // Sắp xếp các tầng theo thứ tự tăng dần (1,2,3,4,...)
+      Object.keys(floors).sort().forEach(floorNum => {
+        // Tạo div floor
+        const floorDiv = document.createElement('div');
+        floorDiv.classList.add('floor');
+
+        // Tạo div room-row chứa floor-title và các phòng
+        const roomRow = document.createElement('div');
+        roomRow.classList.add('room-row');
+
+        // Tạo floor-title với id bằng số tầng (ví dụ: id="1")
+        const floorTitle = document.createElement('div');
+        floorTitle.classList.add('floor-title');
+        floorTitle.id = floorNum;
+        floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
+        roomRow.appendChild(floorTitle);
+
+        // Duyệt qua các phòng thuộc tầng này
+        floors[floorNum].forEach(room => {
+          const roomDiv = document.createElement('div');
+          roomDiv.classList.add('room');
+          roomDiv.classList.add(room.status);
+          roomDiv.innerHTML = `<div class="room-title">${room.roomId}</div>`;
+
+          if (room.status === 'occupied') {
+            // Tìm hóa đơn của phòng
+            const invoice = invoices.find(inv => inv.roomId === room.roomId);
+            let ownerName = '';
+            if (invoice) {
+              // Tìm thông tin khách hàng từ hóa đơn
+              const customer = customers.find(cust => cust.idCard === invoice.idCard);
+              if (customer) ownerName = customer.name;
+            }
+            roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
+            roomDiv.innerHTML += `<div class="tooltip" value="Trả phòng">Trả Phòng</div>`;
+          } else {
+            roomDiv.innerHTML += `<div class="tooltip" value="Nhận phòng">Nhận Phòng</div>`;
+          }
+
+          roomRow.appendChild(roomDiv);
+        });
+
+        floorDiv.appendChild(roomRow);
+        hotelLayout.appendChild(floorDiv);
+      });
+
+      // Đăng ký sự kiện cho tooltip
+      const tooltips = document.querySelectorAll('.tooltip');
+      tooltips.forEach(tooltip => {
+        tooltip.addEventListener('click', function(e) {
+          const action = tooltip.getAttribute('value');
+          if (action === 'Trả phòng') {
+            // Lấy thông tin phòng từ phần tử cha
+            const roomDiv = tooltip.parentElement;
+            const roomId = parseInt(roomDiv.querySelector('.room-title').textContent);
+            const room = rooms.find(r => r.roomId === roomId);
+            const invoice = invoices.find(inv => inv.roomId === roomId);
+            const customer = invoice ? customers.find(cust => cust.idCard === invoice.idCard) : null;
+            const roomType = roomTypes.find(rt => rt.roomTypeId === room.roomTypeId);
+            // Xác định màu header dựa trên roomTypeId
+            let headerBg = '#ccc';
+            if (roomType) {
+              headerBg = roomType.roomTypeId === 1 ? '#ff6666' : (roomType.roomTypeId === 2 ? '#ff9999' : '#ccc');
+            }
+            // Cập nhật nội dung form trả phòng
+            const checkoutForm = document.getElementById('checkout-form');
+            checkoutForm.innerHTML = `
+              <h2 style="background-color: ${headerBg};">Invoice for Room ${room.roomId}</h2>
+              <p>Customer: ${customer ? customer.name : ''}</p>
+              <p>Invoice ID: ${invoice ? invoice.invoiceId : ''}</p>
+              <p>Check-in: ${invoice ? invoice.checkInDate : ''}</p>
+              <p>Check-out: ${invoice ? invoice.checkOutDate : ''}</p>
+              <p>Room Type: ${roomType ? roomType.typeName : ''}</p>
+              <p>Price: ${room.price}</p>
+              <hr>
+              <p>Total Amount: ${invoice ? invoice.amount : ''}</p>
+              <label>Status:</label>
+              <select>
+                  <option>Checked In</option>
+                  <option>Checked Out</option>
+              </select>
+              <button class="confirm">Check Out</button>
+            `;
+            checkoutForm.classList.add('active');
+          }
+          e.stopPropagation();
+        });
+      });
+    }
+
+    renderHotelLayout();
+    
+    //Show chart
+    const chartLink = document.getElementById("chartLink");
+    const barchart = document.getElementById("chart");
+    barchart.style.display = 'none';
+    chartLink.addEventListener('click', function(e){
+        e.preventDefault();
+        hotelLayout.style.display = 'none';
+        statusBar.style.display = 'none';
+        orderContent.style.display = 'none';
+        barchart.style.display = 'block'
+    });
+    </script>
+
+    <!-- JS chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        //Setup block
+        const data = {
+            labels: ['standard','deluxe'],
+            datasets: [{
+                label: 'Sale',
+                data: [30,40],
+                backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.7)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                borderWidth: 1
+            }]
+        };
+
+        //Config block
+        const config = {
+            type: 'bar',
+            data,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        }
+
+        //Render block
+        const chart = new Chart(document.getElementById('myChart'), config);
+    </script>
+</body>
+</html>

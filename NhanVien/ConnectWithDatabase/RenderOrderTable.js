@@ -65,8 +65,8 @@ async function fetchAllDataOrder() {
         chi_tiet_phong_hoa_don = detailData;
         console.log(chi_tiet_phong_hoa_don);
         // Gọi render hoặc xử lý logic tiếp
-
-    renderOrderTable();
+        filterOrders();
+        renderOrderTable();
   } catch (error) {
     console.error("Lỗi khi tải dữ liệu:", error);
   }
@@ -85,8 +85,8 @@ function renderOrderTable() {
     tr.innerHTML = `
       <td>${booking.Ma_don_dat_phong}</td>
       <td>${customer ? customer.Ten : 'Không rõ'}</td>
-      <td>${trangThai}</td>
       <td>${booking.Ma_Loai_Phong}</td>
+      <td>${trangThai}</td>
       <td>
         ${trangThai === 'Chưa xác nhận'
           ? `<a href="#" class="add-btn" data-invoice-id="${booking.Ma_don_dat_phong}">Xác nhận</a>` 
@@ -161,7 +161,41 @@ function renderOrderTable() {
   });
 }
 
+// Đoạn mã này sẽ được thực thi khi trang đã tải xong
+function filterOrders() {
+  const startDate = document.getElementById('start-date').value;
+  const endDate = document.getElementById('end-date').value;
+  const tableRows = document.querySelectorAll('.order-table tbody tr');
 
+  tableRows.forEach(row => {
+    const invoiceId = row.cells[0].innerText.trim();
+    const invoice = hoa_don.find(h => h.Ma_Hoa_Don === invoiceId);
+
+    if (!invoice) {
+      row.style.display = 'none';
+      return;
+    }
+
+    const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === invoice.Ma_don_dat_phong);
+    if (!booking) {
+      row.style.display = 'none';
+      return;
+    }
+
+    const dates = ['Ngay_dat', 'Ngay_nhan', 'Ngay_tra']
+      .map(field => new Date(booking[field]))
+      .filter(d => !isNaN(d.getTime())); // Loại bỏ giá trị không hợp lệ
+
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    const isInRange = dates.some(date => {
+      return (!start || date >= start) && (!end || date <= end);
+    });
+
+    row.style.display = isInRange ? '' : 'none';
+  });
+}
 
 
 

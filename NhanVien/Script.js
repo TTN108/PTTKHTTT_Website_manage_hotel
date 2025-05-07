@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             filterType = 'Deluxe';
           }
           filterHotelLayout(filterType);
+          filterOrders();
         });
     });
 });
@@ -36,45 +37,48 @@ document.addEventListener('DOMContentLoaded', async function() {
 function filterOrders() {
   const startDate = document.getElementById('start-date').value;
   const endDate = document.getElementById('end-date').value;
+  const statusFilter = document.getElementById('filter-status').value;
   const tableRows = document.querySelectorAll('.order-table tbody tr');
 
   tableRows.forEach(row => {
     const invoiceId = row.cells[0].innerText.trim();
     const invoice = hoa_don.find(h => h.Ma_Hoa_Don === invoiceId);
-
-    if (!invoice) {
-      row.style.display = 'none';
-      return;
-    }
+    if (!invoice) return row.style.display = 'none';
 
     const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === invoice.Ma_don_dat_phong);
-    if (!booking) {
-      row.style.display = 'none';
-      return;
-    }
+    if (!booking) return row.style.display = 'none';
 
     const dates = ['Ngay_dat', 'Ngay_nhan', 'Ngay_tra']
       .map(field => new Date(booking[field]))
-      .filter(d => !isNaN(d.getTime())); // Loại bỏ giá trị không hợp lệ
+      .filter(d => !isNaN(d.getTime()));
 
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
 
-    const isInRange = dates.some(date => {
-      return (!start || date >= start) && (!end || date <= end);
-    });
+    const isInRange = dates.some(date => (!start || date >= start) && (!end || date <= end));
+    const matchStatus = !statusFilter || booking.Trang_thai === statusFilter;
 
-    row.style.display = isInRange ? '' : 'none';
+    row.style.display = (isInRange && matchStatus) ? '' : 'none';
   });
 }
 
+function initOrderTab() {
+  fetchAllDataOrder();  // Gọi lại API để tải dữ liệu
+  bindOrderFilterEvents(); // Gắn lại sự kiện lọc (nếu chưa có)
+}
   
   document.addEventListener('click', function(e) {
     const statusBar = document.getElementById('status-bar');
-  
     // Kiểm tra nếu click nằm trong #status-bar nhưng KHÔNG phải vào <span>
     if (statusBar.contains(e.target) && e.target.tagName !== 'SPAN') {
       renderHotelLayout();
+    }
+  });
+  document.addEventListener('click', function(e) {
+    const order = document.getElementById('orderHeader');
+    if (!order.contains(e.target)) {
+      document.getElementById('filter-status').value = "";
+      renderOrderTable();
     }
   });
   function filterHotelLayout(filterType){
@@ -159,42 +163,44 @@ function filterOrders() {
       thotelLayout.appendChild(floorDiv);
     });
   }
-  // function handleCheckInConfirm() {
-  //   // Lấy dữ liệu từ các input trong form
-  //   const name = document.getElementById('customer-name').value;
-  //   const idCard = document.getElementById('customer-idcard').value;
-  //   const email = document.getElementById('customer-email').value;
-  //   const phone = document.getElementById('customer-phone').value;
-  //   const nationality = document.getElementById('customer-address').value;
+  function bindOrderFilterEvents() {
+    const select = document.getElementById('filter-status');
+    if (!select.dataset.bound) {
+      select.addEventListener("change", filterOrders);
+      select.dataset.bound = "true"; // đánh dấu đã gắn rồi, không gắn lại lần nữa
+    }
   
-  //   // Ví dụ: tạo mới đối tượng khách hàng và thêm vào mảng customers trong data.js
-  //   const newCustomer = {
-  //     idCard: idCard,
-  //     name: name,
-  //     phone: phone,
-  //     email: email,
-  //     address: '', // có thể cập nhật thêm nếu cần
-  //     accountId: 'ACC' + (customers.length + 1).toString().padStart(3, '0')
-  //   };
-  //   customers.push(newCustomer);
-    
-  //   // Giả sử đặt phòng: cập nhật trạng thái của phòng được chọn (currentRoom) thành 'occupied'
-  //   if (currentRoom) {
-  //     currentRoom.status = 'occupied';
-  //     // Tạo một hóa đơn mới (có thể tính toán check-in date, amount, ...)
-  //     const newInvoice = {
-  //       invoiceId: 'HD' + (invoices.length + 1).toString().padStart(3, '0'),
-  //       roomId: currentRoom.roomId,
-  //       idCard: idCard,
-  //       checkInDate: new Date().toLocaleString(),
-  //       checkOutDate: '', // sẽ cập nhật sau khi trả phòng
-  //       amount: currentRoom.price
-  //     };
-  //     invoices.push(newInvoice);
-  //   }
+    const start = document.getElementById('start-date');
+    const end = document.getElementById('end-date');
   
-  //   // Đóng form và cập nhật lại giao diện
-  //   closeForms();
-  //   renderHotelLayout();
-  // }
+    if (!start.dataset.bound) {
+      start.addEventListener("change", filterOrders);
+      start.dataset.bound = "true";
+    }
+    if (!end.dataset.bound) {
+      end.addEventListener("change", filterOrders);
+      end.dataset.bound = "true";
+    }
+  }
+  async function initHotelTab() {
+    await fetchAllDataRoom();
+    document.querySelectorAll('#status-bar .status-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.stopPropagation();
+        let filterType = '';
+        if (this.classList.contains('status-free')) {
+          filterType = 'Trống';
+        } else if (this.classList.contains('status-occupied')) {
+          filterType = 'Có người ở';
+        } else if (this.classList.contains('status-cleaning')) {
+          filterType = 'Đang dọn dẹp';
+        } else if (this.classList.contains('status-standard')) {
+          filterType = 'Standard';
+        } else if (this.classList.contains('status-deluxe')) {
+          filterType = 'Deluxe';
+        }
+        filterHotelLayout(filterType);
+      });
+    });
+  }
   

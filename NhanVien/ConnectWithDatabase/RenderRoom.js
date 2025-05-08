@@ -89,6 +89,7 @@ async function fetchAllDataRoom() {
         console.error("Lỗi khi tải dữ liệu:", error);
     }
 }
+
 function filterHotelLayout(filterType){
   let filteredRooms = phong.filter(room => {
     console.log(filterType);
@@ -333,6 +334,7 @@ function renderHotelLayout() {
 }
 
 
+
 function updateStatusBar(rooms, roomTypes) {
     if (!rooms || !roomTypes) {
         console.warn("Không có dữ liệu phòng hoặc loại phòng để cập nhật status bar.");
@@ -497,6 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.querySelector('#form-new-booking').style.display = 'none';
           await fetchAllDataRoom();
           updateCheckOutButton();
+          checkForCheckOut();
           const remaining = don_dat_phong.filter(don =>
             !hoa_don.some(hd => hd.Ma_don_dat_phong === don.Ma_don_dat_phong)
           );
@@ -748,6 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
           form.style.display = 'none';
           await fetchAllDataRoom();
           updateCheckOutButton();
+          checkForCheckOut();
         } else {
           alert("❌ Có lỗi khi lưu: " + result.message);
         }
@@ -811,7 +815,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  function checkForCheckOut() {
+  async function checkForCheckOut() {
+    await fetchAllDataRoom();
     const today = new Date();
     const checkOutBtn = document.getElementById('checkOutBtn');
 
@@ -1033,6 +1038,7 @@ async function delayBooking(bookedList) {
                 // Fetch lại dữ liệu phòng từ DB
                 await fetchAllDataRoom();
                 updateCheckOutButton()
+                checkForCheckOut();
                 updateStatusBar(phong, loai_phong);
                 const index = bookings.findIndex(b => b.Ma_don_dat_phong === booking.Ma_don_dat_phong);
                 if (index !== -1) bookings.splice(index, 1); // Xóa đơn vừa xử lý
@@ -1055,7 +1061,8 @@ async function delayBooking(bookedList) {
                       if (data.success) {
                           console.log("✔️ Đã cập nhật phòng về trạng thái 'Trống'");
                           await fetchAllDataRoom(); // Refresh lại danh sách phòng
-                          updateCheckOutButton()
+                          updateCheckOutButton();
+                          checkForCheckOut();
                         } else {
                           console.error("❌ Không thể cập nhật trạng thái phòng:", data.message);
                       }
@@ -1076,24 +1083,28 @@ async function delayBooking(bookedList) {
     };
 }
 
-function updateCheckOutButton() {
+function formatDate(dateStrOrObj) {
+  const d = new Date(dateStrOrObj);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+async function updateCheckOutButton() {
+  await fetchAllDataRoom();
   const btn = document.getElementById("checkOutBtn");
-  const today = new Date();
-  const todayStr = today.toISOString().split("T")[0]; // 'yyyy-mm-dd'
+  const todayStr = formatDate(new Date());
 
   const validBookings = don_dat_phong.filter(d => {
     if (d.Trang_thai !== "Đã nhận phòng") return false;
-
-    const ngayTraStr = new Date(d.Ngay_tra).toISOString().split("T")[0];
+    const ngayTraStr = formatDate(d.Ngay_tra);
     return (
       ngayTraStr === todayStr &&
       hoa_don.some(h => h.Ma_don_dat_phong === d.Ma_don_dat_phong)
     );
   });
 
-  console.log("📌 Danh sách đơn cần trả hôm nay:", validBookings.map(d => d.Ma_don_dat_phong));
-
+  console.log("📌 Đơn cần trả hôm nay:", validBookings.map(d => d.Ma_don_dat_phong));
   if (btn) btn.disabled = validBookings.length === 0;
+  checkForCheckOut();
 }
 
 

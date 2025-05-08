@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log(loai_phong);
     console.log(do_dung);
     console.log(chi_tiet_phong);
+    console.log(nhan_vien);
     checkForCheckOut();
     document.querySelectorAll('#status-bar .status-item').forEach(item => {
         item.addEventListener('click', function(e) {

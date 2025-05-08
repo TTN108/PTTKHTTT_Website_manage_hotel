@@ -231,7 +231,9 @@
   <button id="confirm-checkout">Xác nhận trả phòng</button>
 </div>
 
-
+  <script>
+    const currentUsername = "<?php echo $_SESSION['user']; ?>";
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="./ConnectWithDatabase/RenderRoom.js"></script>
   <script src="./ConnectWithDatabase/RenderOrderTable.js"></script>

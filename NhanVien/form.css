@@ -122,3 +122,70 @@ button:hover {
   font-size: 16px;
   color: #222;
 }
+/* Media Query for max-width 670px */
+@media (max-width: 670px) {
+  #booking-list-modal,
+  #form-checkin,
+  #form-new-booking,
+  #checkout-list,
+  #form-checkout {
+    width: 90%;
+    max-width: 100%;
+    margin: 15px auto;
+    padding: 15px 20px;
+  }
+
+  #available-rooms,
+  #available-rooms-manual {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  button {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+  
+  ul#booking-list li,
+  ul#checkout-booking-list li {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+
+/* Media Query for max-width 370px */
+@media (max-width: 370px) {
+  #booking-list-modal,
+  #form-checkin,
+  #form-new-booking,
+  #checkout-list,
+  #form-checkout {
+    width: 100%;
+    padding: 10px;
+  }
+
+  input[type="text"],
+  input[type="number"] {
+    font-size: 14px;
+  }
+
+  select {
+    font-size: 14px;
+  }
+
+  #available-rooms,
+  #available-rooms-manual {
+    flex-direction: column;
+  }
+
+  button {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  ul#booking-list li,
+  ul#checkout-booking-list li {
+    font-size: 12px;
+    padding: 6px;
+  }
+}

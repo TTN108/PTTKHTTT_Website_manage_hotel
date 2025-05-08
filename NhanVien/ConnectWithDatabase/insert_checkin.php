@@ -17,6 +17,7 @@ try {
     $booking      = $data['booking'] ?? null;
     $phong        = $data['phong'] ?? null;
     $tongTien     = $data['Gia'] ?? 0;
+    $NVID         = $data['Ma_nhan_vien'] ?? null;
 
     if (!$booking || !$phong) {
         echo json_encode(['success' => false, 'message' => 'Missing booking or room data']);
@@ -67,8 +68,8 @@ try {
     $maDon = $conn->insert_id;
 
     // Hóa đơn
-    $stmt = $conn->prepare("INSERT INTO hoa_don (Ma_don_dat_phong, Ma_nhan_vien, Tong_tien) VALUES (?, NULL, ?)");
-    $stmt->bind_param("id", $maDon, $tongTien);
+    $stmt = $conn->prepare("INSERT INTO hoa_don (Ma_don_dat_phong, Ma_nhan_vien, Tong_tien) VALUES (?, ?, ?)");
+    $stmt->bind_param("isd", $maDon, $NVID,$tongTien);
     $stmt->execute();
     $maHD = $conn->insert_id;
 

@@ -89,9 +89,8 @@ function renderOrderTable() {
       <td>${trangThai}</td>
       <td>
         ${trangThai === 'Chưa xác nhận'
-          ? `<a href="#" class="add-btn" data-invoice-id="${booking.Ma_don_dat_phong}">Xác nhận</a>` 
-          : ''}
-        ${(trangThai === 'Chưa xác nhận' || trangThai === 'Đã xác nhận') && invoice
+          ? `<a href="#" class="them-btn" data-invoice-id="${booking.Ma_don_dat_phong}">Xác nhận</a>` : ''}
+        ${(trangThai === 'Chưa xác nhận' || trangThai === 'Đã xác nhận') 
           ? `<a href="#" class="delete-btn" data-invoice-id="${booking.Ma_don_dat_phong}">Xóa</a>` : ''}
         ${(trangThai === 'Đã trả phòng' || trangThai === 'Đã nhận phòng') 
           ? `<a href="#" class="detail-btn" data-invoice-id="${booking.Ma_don_dat_phong}">Chi tiết</a>` : ''}
@@ -109,7 +108,7 @@ function renderOrderTable() {
   });
 
   // Xác nhận
-  tbody.querySelectorAll('.add-btn').forEach(btn => {
+  tbody.querySelectorAll('.them-btn').forEach(btn => {
     btn.addEventListener('click', async e => {
       e.preventDefault();
       const bookingId = btn.dataset.invoiceId;
@@ -139,6 +138,7 @@ function renderOrderTable() {
     btn.addEventListener('click', async e => {
       e.preventDefault();
       const invoiceId = btn.dataset.invoiceId;
+      const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === invoiceId);
       if (booking && (booking.Trang_thai === 'Chưa xác nhận' || booking.Trang_thai === 'Đã xác nhận')) {
         if (confirm("Bạn có chắc muốn xóa hóa đơn đặt phòng này?")) {
           // Xóa trong mảng JS

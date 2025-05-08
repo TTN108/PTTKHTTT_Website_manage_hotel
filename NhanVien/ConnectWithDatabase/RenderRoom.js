@@ -10,6 +10,7 @@ let chi_tiet_hoa_don = [];
 let chi_tiet_phong_hoa_don = [];
 let don_dat_phong = [];
 let selectedRooms = [];
+let nhan_vien = [];
 let booking = {};
 async function fetchAllDataRoom() {
     phong = [];
@@ -23,9 +24,10 @@ async function fetchAllDataRoom() {
     don_dat_phong = [];
     chi_tiet_phong = [];
     selectedRooms = [];
+    nhan_vien = [];
     booking = {};
     try {
-        const [roomsRes, roomTypesRes, customersRes, invoicesRes, objectsRes, accountsRes, orderDetailRes, roomDetailsRes, applyFormRes, detailsRes] = await Promise.all([
+        const [roomsRes, roomTypesRes, customersRes, invoicesRes, objectsRes, accountsRes, orderDetailRes, roomDetailsRes, applyFormRes, detailsRes, staffsRes] = await Promise.all([
             fetch('ConnectWithDatabase/get_rooms.php'),
             fetch('ConnectWithDatabase/get_roomType.php'),
             fetch('ConnectWithDatabase/get_customers.php'),
@@ -35,14 +37,15 @@ async function fetchAllDataRoom() {
             fetch('ConnectWithDatabase/get_orderDetails.php'),
             fetch('ConnectWithDatabase/get_roomDetails.php'),
             fetch('ConnectWithDatabase/get_ApplyForm.php'),
-            fetch('ConnectWithDatabase/get_Details.php')
+            fetch('ConnectWithDatabase/get_Details.php'),
+            fetch('ConnectWithDatabase/get_staff.php')
         ]);
 
-        if (!roomsRes.ok || !roomTypesRes.ok || !customersRes.ok || !invoicesRes.ok || !objectsRes.ok || !accountsRes.ok || !orderDetailRes || !roomDetailsRes.ok || !applyFormRes.ok || !detailsRes.ok) {
+        if (!roomsRes.ok || !roomTypesRes.ok || !customersRes.ok || !invoicesRes.ok || !objectsRes.ok || !accountsRes.ok || !orderDetailRes || !roomDetailsRes.ok || !applyFormRes.ok || !detailsRes.ok || !staffsRes.ok) {
             throw new Error("Có lỗi khi fetch một trong các file PHP");
         }
 
-        const [roomsData, roomTypesData, customersData, invoicesData, objectsData, accountsData, orderDetailData, roomDetailsData, applyFormData, detailData] = await Promise.all([
+        const [roomsData, roomTypesData, customersData, invoicesData, objectsData, accountsData, orderDetailData, roomDetailsData, applyFormData, detailData, staffData] = await Promise.all([
             roomsRes.json(),
             roomTypesRes.json(),
             customersRes.json(),
@@ -52,7 +55,8 @@ async function fetchAllDataRoom() {
             orderDetailRes.json(),
             roomDetailsRes.json(),
             applyFormRes.json(),
-            detailsRes.json()
+            detailsRes.json(),
+            staffsRes.json()
         ]);
 
         // Lưu vào biến toàn cục hoặc dùng tiếp
@@ -76,6 +80,8 @@ async function fetchAllDataRoom() {
         console.log(don_dat_phong);
         chi_tiet_phong_hoa_don = detailData;
         console.log(chi_tiet_phong_hoa_don);
+        nhan_vien = staffData;
+        console.log(nhan_vien);
         // Gọi render hoặc xử lý logic tiếp
         renderHotelLayout();
 
@@ -378,6 +384,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (roomType) {
         totalAmount = roomType.Gia * booking.So_luong_phong;
     }  
+    const nv = nhan_vien.find(nv => nv.Account === currentUsername);
+    idNV = nv.Ma_nhan_vien;
     try {
       const res = await fetch('ConnectWithDatabase/ConfirmBooking.php', {
         method: 'POST',
@@ -385,7 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({
           Ma_don_dat_phong: booking.Ma_don_dat_phong,
           Tong_tien: totalAmount,
-          phong: selectedRoomIds
+          phong: selectedRoomIds,
+          Ma_nhan_vien: idNV
         })
       });
       
@@ -581,7 +590,6 @@ document.addEventListener('DOMContentLoaded', () => {
   
       let Account = { Username: username };
       let khachHang = { CCCD: cccd };
-  
       if (!isUsernameExist && !isCCCDExist) {
         Account = {
           Username: username,
@@ -619,7 +627,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const roomType = loai_phong.find(rt => rt.Ma_Loai_Phong === room.Ma_Loai_Phong);
         total += roomType.Gia;
       });
-  
+      const nv = nhan_vien.find(nv => nv.Account === currentUsername);
+      idNV = nv.Ma_nhan_vien;
       try {
         const res = await fetch('ConnectWithDatabase/insert_checkin.php', {
           method: 'POST',
@@ -629,7 +638,8 @@ document.addEventListener('DOMContentLoaded', () => {
             customer: isCCCDExist ? null : khachHang,
             booking: donDat,
             phong: selectedRooms,
-            Gia: total
+            Gia: total,
+            Ma_nhan_vien: idNV
           })
         });
         const result = await res.json();

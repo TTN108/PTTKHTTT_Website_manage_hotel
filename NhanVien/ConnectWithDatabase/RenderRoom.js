@@ -1083,23 +1083,25 @@ async function delayBooking(bookedList) {
 }
 
 function updateCheckOutButton() {
-  const today = new Date();
   const btn = document.getElementById("checkOutBtn");
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0]; // 'yyyy-mm-dd'
 
   const validBookings = don_dat_phong.filter(d => {
     if (d.Trang_thai !== "Đã nhận phòng") return false;
-    const ngayTra = new Date(d.Ngay_tra);
+
+    const ngayTraStr = new Date(d.Ngay_tra).toISOString().split("T")[0];
     return (
-      ngayTra.getFullYear() === today.getFullYear() &&
-      ngayTra.getMonth() === today.getMonth() &&
-      ngayTra.getDate() === today.getDate() &&
+      ngayTraStr === todayStr &&
       hoa_don.some(h => h.Ma_don_dat_phong === d.Ma_don_dat_phong)
     );
   });
-  console.log('Đơn cần trả: ' + validBookings);
-  if (btn)
-    btn.disabled = validBookings.length === 0;
+
+  console.log("📌 Danh sách đơn cần trả hôm nay:", validBookings.map(d => d.Ma_don_dat_phong));
+
+  if (btn) btn.disabled = validBookings.length === 0;
 }
+
 
   
   // Đặt cờ để biết form mới vừa mở

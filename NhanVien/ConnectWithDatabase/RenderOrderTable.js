@@ -209,10 +209,12 @@ function showOrderDetail(invoiceId) {
   console.log(booking);
   const customer = khach_hang.find(k => k.Account === booking.Account);
   let Room = [];
+  let count = 0;
   const invoiceDetail = chi_tiet_hoa_don.filter(ct => ct.Ma_Hoa_Don === invoice.Ma_Hoa_Don);
   invoiceDetail.forEach(e => {
     const room = phong.find(p => p.ID === e.Ma_phong);
     Room.push(room.ID);
+    count++;
   });
   console.log(Room);
   const roomType = booking ? loai_phong.find(lp => lp.Ma_Loai_Phong === booking.Ma_Loai_Phong) : null;
@@ -233,7 +235,7 @@ function showOrderDetail(invoiceId) {
 
   // Tính tổng giá đồ dùng
   const objectPrice = objectInRoom.reduce((sum, obj) => Number(sum) + Number((obj.Gia || 0)), 0);
-  const totalPrice = roomType ? (Number(roomType.Gia) + Number(objectPrice)) : objectPrice;
+  const totalPrice = roomType ? (Number(roomType.Gia) * count  + Number(objectPrice)) : objectPrice;
   console.log(objectInRoom);
   const status = booking.Trang_thai;
   let RoomName = "";

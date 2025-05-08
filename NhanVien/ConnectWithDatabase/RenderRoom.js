@@ -294,32 +294,25 @@ function renderHotelLayout() {
           if (room.Trang_thai === 'Có người ở') {
               let ownerName = '';
 
-              // 🔁 Tìm tất cả chi tiết hóa đơn theo mã phòng
-              const roomDetails = chi_tiet_hoa_don.filter(r => r.Ma_phong === room.ID);
-              let hoaDonDetail = null;
-
-              // 🔁 Tìm hóa đơn đầu tiên tương ứng
-              for (let detail of roomDetails) {
-                  const hoaDon = hoa_don.find(d => d.Ma_Hoa_Don === detail.Ma_Hoa_Don);
+              // ✅ Tìm chi tiết hóa đơn chứa phòng này
+              const ct = chi_tiet_hoa_don.find(c => c.Ma_phong === room.ID);
+              if (ct) {
+                  // ✅ Tìm hóa đơn tương ứng
+                  const hoaDon = hoa_don.find(h => h.Ma_Hoa_Don === ct.Ma_Hoa_Don);
                   if (hoaDon) {
-                      hoaDonDetail = hoaDon;
-                      break;
-                  }
-              }
-
-              // 🔁 Truy ngược ra tên khách hàng
-              if (hoaDonDetail && hoaDonDetail.Ma_don_dat_phong) {
-                  const invoice = don_dat_phong.find(inv =>
-                      inv && inv.Trang_thai === "Đã nhận phòng" &&
-                      inv.Ma_don_dat_phong === hoaDonDetail.Ma_don_dat_phong
-                  );
-
-                  if (invoice && invoice.Account) {
-                      const accountInfo = account.find(acc => acc.Username === invoice.Account);
-                      if (accountInfo) {
-                          const customer = khach_hang.find(cust => cust.Account === accountInfo.Username);
-                          if (customer) {
-                              ownerName = customer.Ten;
+                      // ✅ Tìm đơn đặt phòng đã nhận
+                      const don = don_dat_phong.find(d =>
+                          d.Ma_don_dat_phong === hoaDon.Ma_don_dat_phong &&
+                          d.Trang_thai === "Đã nhận phòng"
+                      );
+                      if (don) {
+                          // ✅ Tìm thông tin khách hàng
+                          const acc = account.find(a => a.Username === don.Account);
+                          if (acc) {
+                              const kh = khach_hang.find(k => k.Account === acc.Username);
+                              if (kh) {
+                                  ownerName = kh.Ten;
+                              }
                           }
                       }
                   }
@@ -336,8 +329,9 @@ function renderHotelLayout() {
       hotelLayout.appendChild(floorDiv);
   });
 
-  updateStatusBar(phong, loai_phong); // Gọi hàm cập nhật thanh trạng thái
+  updateStatusBar(phong, loai_phong); // Cập nhật thanh trạng thái
 }
+
 
 function updateStatusBar(rooms, roomTypes) {
     if (!rooms || !roomTypes) {

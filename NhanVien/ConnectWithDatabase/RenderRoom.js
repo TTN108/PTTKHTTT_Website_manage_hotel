@@ -78,6 +78,7 @@ async function fetchAllDataRoom() {
         console.log(chi_tiet_phong_hoa_don);
         // Gọi render hoặc xử lý logic tiếp
         renderHotelLayout();
+
     } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
     }
@@ -403,7 +404,8 @@ document.addEventListener('DOMContentLoaded', () => {
           alert('✅ Đã nhận phòng thành công');
           document.querySelector('#form-checkin').style.display = 'none';
           document.querySelector('#form-new-booking').style.display = 'none';
-          fetchAllDataRoom();
+          await fetchAllDataRoom();
+          updateCheckOutButton();
           const remaining = don_dat_phong.filter(don =>
             !hoa_don.some(hd => hd.Ma_don_dat_phong === don.Ma_don_dat_phong)
           );
@@ -423,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  function showNewBookingForm() {
+  async function showNewBookingForm() {
     const form = document.querySelector('#form-new-booking');
     const roomTypeSelect = form.querySelector('#select-room-type');
     const newCustomerFields = form.querySelector('#new-customer-fields');
@@ -633,8 +635,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await res.json();
         if (result.success) {
           alert("✅ Đã nhận phòng thành công.");
+          form.querySelectorAll('input, select').forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+              input.checked = false;
+            } else {
+              input.value = '';
+            }
+          });
+          
+          // Ẩn vùng nhập thông tin khách hàng mới
+          newCustomerFields.style.display = 'none';
+          
+          // Xoá vùng chọn phòng (nếu có)
+          const manualRoomContainer = form.querySelector('#available-rooms-manual');
+          if (manualRoomContainer) manualRoomContainer.innerHTML = '';
+          
+          // Xoá các nút phòng đã chọn
+          form.querySelectorAll('.room-button.selected').forEach(btn => btn.classList.remove('selected'));
+          selectedRooms = [];
           form.style.display = 'none';
-          fetchAllDataRoom();
+          await fetchAllDataRoom();
+          updateCheckOutButton();
         } else {
           alert("❌ Có lỗi khi lưu: " + result.message);
         }
@@ -809,7 +830,7 @@ async function delayBooking(bookedList) {
       list.appendChild(li);
     });
   }
-  function showCheckOutForm(booking,bookings) {
+  async function showCheckOutForm(booking,bookings) {
     const form = document.getElementById("form-checkout");
     const roomSection = document.getElementById("checkout-room-section");
     const maDatSpan = document.getElementById("checkout-ma-dat");
@@ -918,7 +939,8 @@ async function delayBooking(bookedList) {
                 alert("✅ Trả phòng thành công.");
                 form.style.display = 'none'; // Ẩn form
                 // Fetch lại dữ liệu phòng từ DB
-                fetchAllDataRoom();
+                await fetchAllDataRoom();
+                updateCheckOutButton()
                 updateStatusBar(phong, loai_phong);
                 const index = bookings.findIndex(b => b.Ma_don_dat_phong === booking.Ma_don_dat_phong);
                 if (index !== -1) bookings.splice(index, 1); // Xóa đơn vừa xử lý
@@ -937,27 +959,48 @@ async function delayBooking(bookedList) {
                       })
                   })
                   .then(res => res.json())
-                  .then(data => {
+                  .then(async data => {
                       if (data.success) {
                           console.log("✔️ Đã cập nhật phòng về trạng thái 'Trống'");
-                          fetchAllDataRoom(); // Refresh lại danh sách phòng
-                      } else {
+                          await fetchAllDataRoom(); // Refresh lại danh sách phòng
+                          updateCheckOutButton()
+                        } else {
                           console.error("❌ Không thể cập nhật trạng thái phòng:", data.message);
                       }
                   })
                   .catch(err => {
                       console.error("❌ Lỗi khi gửi yêu cầu cập nhật trạng thái phòng:", err);
                   });
-              }, 60000); // 60 giây
+              }, 5000); // 10 giây
               
             } else {
                 alert("❌ Lỗi khi lưu trả phòng: " + result.message);
             }
+            
         } catch (err) {
             console.error("Lỗi fetch hoặc parse JSON:", err);
             alert("❌ Lỗi xử lý phản hồi từ server.");
         }
     };
+}
+
+function updateCheckOutButton() {
+  const today = new Date();
+  const btn = document.getElementById("checkOutBtn");
+
+  const validBookings = don_dat_phong.filter(d => {
+    if (d.Trang_thai !== "Đã nhận phòng") return false;
+    const ngayTra = new Date(d.Ngay_tra);
+    return (
+      ngayTra.getFullYear() === today.getFullYear() &&
+      ngayTra.getMonth() === today.getMonth() &&
+      ngayTra.getDate() === today.getDate() &&
+      hoa_don.some(h => h.Ma_don_dat_phong === d.Ma_don_dat_phong)
+    );
+  });
+  console.log('Đơn cần trả: ' + validBookings);
+  if (btn)
+    btn.disabled = validBookings.length === 0;
 }
 
   

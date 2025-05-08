@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           filterOrders();
         });
     });
+    updateCheckOutButton();
 });
 
 // Đoạn mã này sẽ được thực thi khi trang đã tải xong

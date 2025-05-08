@@ -51,9 +51,15 @@ ul#checkout-booking-list li:hover {
 
 /* Input, select, form control */
 input[type="text"],
-input[type="number"],
-select {
+input[type="number"] {
   width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+select {
+  max-width: 200px;
   padding: 8px;
   margin-bottom: 12px;
   border: 1px solid #ccc;
@@ -68,7 +74,6 @@ button {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  margin-top: 10px;
   transition: background-color 0.2s;
 }
 

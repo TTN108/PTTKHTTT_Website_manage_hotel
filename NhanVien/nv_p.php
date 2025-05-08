@@ -83,6 +83,7 @@
             <option value="Đã xác nhận">Đã xác nhận</option>
             <option value="Đã nhận phòng">Đã nhận phòng</option>
             <option value="Đã trả phòng">Đã trả phòng</option>
+            <option value="Đã huỷ">Đã huỷ</options>
           </select>
     </div>
 

@@ -171,84 +171,172 @@ function filterHotelLayout(filterType){
     thotelLayout.appendChild(floorDiv);
   });
 }
+// function renderHotelLayout() {
+//     console.log(hoa_don);
+//     const hotelLayout = document.getElementById('hotel-wrapper');
+//     hotelLayout.innerHTML = ''; // Xóa nội dung cũ
+
+//     // Nhóm phòng theo tầng (dựa vào chữ số đầu tiên trong ID sau chữ cái, ví dụ: P101 -> tầng 1)
+//     const floors = {};
+//     phong.forEach(room => {
+//         const idMatch = room.ID.match(/\d+/); // lấy số trong ID
+//         const floorNum = idMatch ? idMatch[0][1] : '0'; // lấy chữ số đầu tiên
+//         if (!floors[floorNum]) {
+//             floors[floorNum] = [];
+//         }
+//         floors[floorNum].push(room);
+//     });
+
+//     Object.keys(floors).sort().forEach(floorNum => {
+//         const floorDiv = document.createElement('div');
+//         floorDiv.classList.add('floor');
+
+//         const roomRow = document.createElement('div');
+//         roomRow.classList.add('room-row');
+
+//         const floorTitle = document.createElement('div');
+//         floorTitle.classList.add('floor-title');
+//         floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
+//         roomRow.appendChild(floorTitle);
+
+//         const roomContainer = document.createElement('div');
+//         roomContainer.classList.add('room-container');
+
+//         floors[floorNum].forEach(room => {
+//             const roomDiv = document.createElement('div');
+//             let statusClass = room.Trang_thai === 'Trống' ? 'free'
+//                 : room.Trang_thai === 'Có người ở' ? 'occupied'
+//                 : room.Trang_thai === 'Đang dọn dẹp' ? 'cleaning'
+//                 : '';
+//             roomDiv.classList.add('room', statusClass);
+//             roomDiv.innerHTML = `<div class="room-title">${room.ID}</div>`;
+
+//             if (room.Trang_thai === 'Có người ở') {
+//                 let ownerName = '';
+//                 const roomDetail = chi_tiet_hoa_don.find(r => r.Ma_phong === room.ID);
+//                 let hoaDonDetail = null;
+
+//                 if (roomDetail) {
+//                     hoaDonDetail = hoa_don.find(d => d.Ma_Hoa_Don === roomDetail.Ma_Hoa_Don);
+//                 }
+
+//                 if (hoaDonDetail && hoaDonDetail.Ma_don_dat_phong) {
+//                     const invoice = don_dat_phong.find(inv =>
+//                         inv && inv.Trang_thai === "Đã nhận phòng" &&
+//                         inv.Ma_don_dat_phong === hoaDonDetail.Ma_don_dat_phong
+//                     );
+
+//                     if (invoice && invoice.Account) {
+//                         const accountInfo = account.find(acc => acc.Username === invoice.Account);
+//                         if (accountInfo) {
+//                             const customer = khach_hang.find(cust => cust.Account === accountInfo.Username);
+//                             if (customer) {
+//                                 ownerName = customer.Ten;
+//                             }
+//                         }
+//                     }
+//                 }
+
+//                 roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
+//             }
+
+//             roomContainer.appendChild(roomDiv);
+//         });
+
+//         roomRow.appendChild(roomContainer);
+//         floorDiv.appendChild(roomRow);
+//         hotelLayout.appendChild(floorDiv);
+//     });
+
+//     updateStatusBar(phong, loai_phong); // Gọi hàm cập nhật thanh trạng thái
+// }
+
 function renderHotelLayout() {
-    console.log(hoa_don);
-    const hotelLayout = document.getElementById('hotel-wrapper');
-    hotelLayout.innerHTML = ''; // Xóa nội dung cũ
+  console.log(hoa_don);
+  const hotelLayout = document.getElementById('hotel-wrapper');
+  hotelLayout.innerHTML = ''; // Xóa nội dung cũ
 
-    // Nhóm phòng theo tầng (dựa vào chữ số đầu tiên trong ID sau chữ cái, ví dụ: P101 -> tầng 1)
-    const floors = {};
-    phong.forEach(room => {
-        const idMatch = room.ID.match(/\d+/); // lấy số trong ID
-        const floorNum = idMatch ? idMatch[0][1] : '0'; // lấy chữ số đầu tiên
-        if (!floors[floorNum]) {
-            floors[floorNum] = [];
-        }
-        floors[floorNum].push(room);
-    });
+  // Nhóm phòng theo tầng (dựa vào chữ số đầu tiên trong ID sau chữ cái, ví dụ: P101 -> tầng 1)
+  const floors = {};
+  phong.forEach(room => {
+      const idMatch = room.ID.match(/\d+/); // lấy số trong ID
+      const floorNum = idMatch ? idMatch[0][1] : '0'; // lấy chữ số đầu tiên
+      if (!floors[floorNum]) {
+          floors[floorNum] = [];
+      }
+      floors[floorNum].push(room);
+  });
 
-    Object.keys(floors).sort().forEach(floorNum => {
-        const floorDiv = document.createElement('div');
-        floorDiv.classList.add('floor');
+  Object.keys(floors).sort().forEach(floorNum => {
+      const floorDiv = document.createElement('div');
+      floorDiv.classList.add('floor');
 
-        const roomRow = document.createElement('div');
-        roomRow.classList.add('room-row');
+      const roomRow = document.createElement('div');
+      roomRow.classList.add('room-row');
 
-        const floorTitle = document.createElement('div');
-        floorTitle.classList.add('floor-title');
-        floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
-        roomRow.appendChild(floorTitle);
+      const floorTitle = document.createElement('div');
+      floorTitle.classList.add('floor-title');
+      floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
+      roomRow.appendChild(floorTitle);
 
-        const roomContainer = document.createElement('div');
-        roomContainer.classList.add('room-container');
+      const roomContainer = document.createElement('div');
+      roomContainer.classList.add('room-container');
 
-        floors[floorNum].forEach(room => {
-            const roomDiv = document.createElement('div');
-            let statusClass = room.Trang_thai === 'Trống' ? 'free'
-                : room.Trang_thai === 'Có người ở' ? 'occupied'
-                : room.Trang_thai === 'Đang dọn dẹp' ? 'cleaning'
-                : '';
-            roomDiv.classList.add('room', statusClass);
-            roomDiv.innerHTML = `<div class="room-title">${room.ID}</div>`;
+      floors[floorNum].forEach(room => {
+          const roomDiv = document.createElement('div');
+          let statusClass = room.Trang_thai === 'Trống' ? 'free'
+              : room.Trang_thai === 'Có người ở' ? 'occupied'
+              : room.Trang_thai === 'Đang dọn dẹp' ? 'cleaning'
+              : '';
+          roomDiv.classList.add('room', statusClass);
+          roomDiv.innerHTML = `<div class="room-title">${room.ID}</div>`;
 
-            if (room.Trang_thai === 'Có người ở') {
-                let ownerName = '';
-                const roomDetail = chi_tiet_hoa_don.find(r => r.Ma_phong === room.ID);
-                let hoaDonDetail = null;
+          if (room.Trang_thai === 'Có người ở') {
+              let ownerName = '';
 
-                if (roomDetail) {
-                    hoaDonDetail = hoa_don.find(d => d.Ma_Hoa_Don === roomDetail.Ma_Hoa_Don);
-                }
+              // 🔁 Tìm tất cả chi tiết hóa đơn theo mã phòng
+              const roomDetails = chi_tiet_hoa_don.filter(r => r.Ma_phong === room.ID);
+              let hoaDonDetail = null;
 
-                if (hoaDonDetail && hoaDonDetail.Ma_don_dat_phong) {
-                    const invoice = don_dat_phong.find(inv =>
-                        inv && inv.Trang_thai === "Đã nhận phòng" &&
-                        inv.Ma_don_dat_phong === hoaDonDetail.Ma_don_dat_phong
-                    );
+              // 🔁 Tìm hóa đơn đầu tiên tương ứng
+              for (let detail of roomDetails) {
+                  const hoaDon = hoa_don.find(d => d.Ma_Hoa_Don === detail.Ma_Hoa_Don);
+                  if (hoaDon) {
+                      hoaDonDetail = hoaDon;
+                      break;
+                  }
+              }
 
-                    if (invoice && invoice.Account) {
-                        const accountInfo = account.find(acc => acc.Username === invoice.Account);
-                        if (accountInfo) {
-                            const customer = khach_hang.find(cust => cust.Account === accountInfo.Username);
-                            if (customer) {
-                                ownerName = customer.Ten;
-                            }
-                        }
-                    }
-                }
+              // 🔁 Truy ngược ra tên khách hàng
+              if (hoaDonDetail && hoaDonDetail.Ma_don_dat_phong) {
+                  const invoice = don_dat_phong.find(inv =>
+                      inv && inv.Trang_thai === "Đã nhận phòng" &&
+                      inv.Ma_don_dat_phong === hoaDonDetail.Ma_don_dat_phong
+                  );
 
-                roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
-            }
+                  if (invoice && invoice.Account) {
+                      const accountInfo = account.find(acc => acc.Username === invoice.Account);
+                      if (accountInfo) {
+                          const customer = khach_hang.find(cust => cust.Account === accountInfo.Username);
+                          if (customer) {
+                              ownerName = customer.Ten;
+                          }
+                      }
+                  }
+              }
 
-            roomContainer.appendChild(roomDiv);
-        });
+              roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
+          }
 
-        roomRow.appendChild(roomContainer);
-        floorDiv.appendChild(roomRow);
-        hotelLayout.appendChild(floorDiv);
-    });
+          roomContainer.appendChild(roomDiv);
+      });
 
-    updateStatusBar(phong, loai_phong); // Gọi hàm cập nhật thanh trạng thái
+      roomRow.appendChild(roomContainer);
+      floorDiv.appendChild(roomRow);
+      hotelLayout.appendChild(floorDiv);
+  });
+
+  updateStatusBar(phong, loai_phong); // Gọi hàm cập nhật thanh trạng thái
 }
 
 function updateStatusBar(rooms, roomTypes) {
@@ -337,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookingIdSpan = document.getElementById('current-booking-id');
   
     container.innerHTML = '';
-    bookingIdSpan.textContent = booking.Ma_don_dat_phong;
+    bookingIdSpan.textContent = booking.Ma_don_dat_phong + ' Số lượng phòng: ' + booking.So_luong_phong;
   
     availableRooms.forEach(room => {
       const btn = document.createElement('button');

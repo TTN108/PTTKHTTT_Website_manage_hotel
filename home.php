@@ -21,6 +21,8 @@
             require_once 'includes/content/content.php';
             require_once 'includes/footer/footer.php';
         ?>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="js/messageDialog.js"></script>
         <script src="js/checkin_checkout.js"></script>
         <script src="js/login_signin.js"></script>

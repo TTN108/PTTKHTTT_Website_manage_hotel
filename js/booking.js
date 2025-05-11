@@ -194,8 +194,8 @@ document.getElementById("account-history-btn").addEventListener("click",()=>{
             tbody.innerHTML='';
             data.forEach(row => {
                 let tr = document.createElement("tr");
-                let op = row.Trang_thai==="Chưa xác nhận" ? "Hủy" :"Chi tiết";
-                let btn = row.Trang_thai==="Chưa xác nhận" || row.Trang_thai==="Đã trả phòng" ? `<button class="history-button" value="${op}" data-id="${row.Ma_don_dat_phong}">${op}</button>`:'';
+                let op = (row.Trang_thai==="Chưa xác nhận" || row.Trang_thai==="Đã xác nhận") ? "Hủy" :"Chi tiết";
+                let btn = (row.Trang_thai==="Chưa xác nhận" || row.Trang_thai==="Đã trả phòng"|| row.Trang_thai==="Đã xác nhận") ? `<button class="history-button" value="${op}" data-id="${row.Ma_don_dat_phong}">${op}</button>`:'';
                 tr.innerHTML = `
                     <td>${row.Ma_don_dat_phong}</td>
                     <td>${row.Ngay_nhan}</td>
@@ -262,16 +262,17 @@ document.getElementById("account-history-btn").addEventListener("click",()=>{
                                     let hoaDonHtml = `
                                         <div id="invoice-x" class="x-ctn"><i class='fa-regular fa-circle-xmark x'></i></div>
                                         <h3>Thông tin Hóa đơn</h3><br>
-                                        <p><strong>Mã hóa đơn:</strong> ${hoaDon.Ma_Hoa_Don}</p><br>
-                                        <p><strong>Mã đơn đặt phòng:</strong> ${hoaDon.Ma_don_dat_phong}</p><br>
-                                        <p><strong>Ngày đặt:</strong> ${hoaDon.Ngay_dat}</p><br>
-                                        <p><strong>Ngày nhận:</strong> ${hoaDon.Ngay_nhan}</p><br>
-                                        <p><strong>Ngày trả:</strong> ${hoaDon.Ngay_tra}</p><br>
-                                        <p><strong>Số lượng phòng:</strong> ${hoaDon.So_luong_phong}</p><br>
-                                        <p><strong>Số lượng người:</strong> ${hoaDon.So_luong_nguoi}</p><br>
-                                        <p><strong>Nhân viên thanh toán:</strong> ${hoaDon.Ma_nhan_vien}</p><br>
-                                        <br><h3><strong>Tổng tiền:</strong> ${hoaDon.Tong_tien} VND</h3><br><br>
-                                        <h3>Chi tiết:</p></h3>
+                                        <div id="invoice">
+                                            <p><strong>Mã hóa đơn:</strong> ${hoaDon.Ma_Hoa_Don}</p><br>
+                                            <p><strong>Mã đơn đặt phòng:</strong> ${hoaDon.Ma_don_dat_phong}</p><br>
+                                            <p><strong>Ngày đặt:</strong> ${hoaDon.Ngay_dat}</p><br>
+                                            <p><strong>Ngày nhận:</strong> ${hoaDon.Ngay_nhan}</p><br>
+                                            <p><strong>Ngày trả:</strong> ${hoaDon.Ngay_tra}</p><br>
+                                            <p><strong>Số lượng phòng:</strong> ${hoaDon.So_luong_phong}</p><br>
+                                            <p><strong>Số lượng người:</strong> ${hoaDon.So_luong_nguoi}</p><br>
+                                            <p><strong>Nhân viên thanh toán:</strong> ${hoaDon.Ma_nhan_vien}</p><br>
+                                            <br><h3><strong>Tổng tiền:</strong> ${hoaDon.Tong_tien} VND</h3><br><br>
+                                            <h3>Chi tiết:</p></h3>
                                     `;
                             
                                     // Danh sách phòng
@@ -293,7 +294,7 @@ document.getElementById("account-history-btn").addEventListener("click",()=>{
                                         huHtml += `</ul>`;
                                     }
                                 
-                                    container.innerHTML = hoaDonHtml + phongHtml + huHtml;
+                                    container.innerHTML = hoaDonHtml + phongHtml + huHtml + `</div><button id="printInvoiceBtn" onclick="printInvoice()">In hóa đơn</button>`;
                                     document.getElementById("invoice-x").addEventListener("click",()=>{
                                         container.classList.add("hidden");
                                     });
@@ -323,3 +324,26 @@ document.getElementById("account-history-btn").addEventListener("click",()=>{
         console.error(error);
     });
 });
+
+async function printInvoice() {
+    const { jsPDF } = window.jspdf;
+    const element = document.getElementById("invoice");
+
+    const canvas = await html2canvas(element);
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pageWidth;
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("hoa_don.pdf");
+}

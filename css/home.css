@@ -68,7 +68,7 @@ a:hover {
     line-height: 75px;  /* Căn giữa văn bản */
     opacity: 0;  /* Ban đầu ẩn phần tử */
     z-index: 99999999;
-    border: 2px solid lightgray;
+    border: 2px solid gray;
 }
 
 .icon

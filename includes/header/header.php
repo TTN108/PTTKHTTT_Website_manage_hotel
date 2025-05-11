@@ -178,3 +178,4 @@
 </div>
 
 <div id="invoice-details" class="hidden"></div>
+

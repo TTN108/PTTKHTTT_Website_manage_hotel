@@ -15,6 +15,23 @@
 
     $response = [];
     while ($row = $result->fetch_assoc()) {
+        if (($row['Trang_thai']==='Chưa xác nhận'||$row['Trang_thai']==='Đã xác nhận')&&$row['Ngay_nhan']<date('Y-m-d'))
+        {
+            $stmt = $conn->prepare("update don_dat_phong set Trang_thai = 'Quá hạn' where Ma_don_dat_phong = ?");
+            $stmt->bind_param('i',$row['Ma_don_dat_phong']);
+            $stmt->execute();
+            $stmt->close();
+            $row['Trang_thai']='Quá hạn';
+        }
+        if ($row['Trang_thai']==='Đã nhận phòng'&&$row['Ngay_tra']<date('Y-m-d'))
+        {
+            $stmt = $conn->prepare("update don_dat_phong set Trang_thai = 'Quá hạn trả phòng' where Ma_don_dat_phong = ?");
+            $stmt->bind_param('i',$row['Ma_don_dat_phong']);
+            $stmt->execute();
+            $stmt->close();
+            $row['Trang_thai']='Quá hạn trả phòng';
+        }
+
         $response[] = $row;
     }
 

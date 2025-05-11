@@ -6,12 +6,12 @@
  const orderContent = document.getElementById('orderContent');
  const statusBar = document.getElementById('status-bar');
  const chartLink = document.getElementById("chartLink");
- const barchart = document.getElementById("chart");
- barchart.style.display = 'none';
- // Hiển thị mặc định Sơ đồ khách sạn
-hotelLayout.style.display = 'block';
-statusBar.style.display = 'flex';
-orderContent.style.display = 'none';
+const barchart = document.getElementById("chart");
+    barchart.style.display = 'none';
+    // Hiển thị mặc định Sơ đồ khách sạn
+    hotelLayout.style.display = 'block';
+    statusBar.style.display = 'flex';
+    orderContent.style.display = 'none';
  
  // Sự kiện chuyển đổi giao diện
  hotelLink.addEventListener('click', function(e) {
@@ -20,6 +20,7 @@ orderContent.style.display = 'none';
    statusBar.style.display = 'flex';
    orderContent.style.display = 'none';
    barchart.style.display = 'none';
+   initHotelTab();
  });
  chartLink.addEventListener('click', function(e) {
     e.preventDefault();
@@ -34,6 +35,7 @@ orderContent.style.display = 'none';
    statusBar.style.display = 'none';
    orderContent.style.display = 'block';
    barchart.style.display = 'none';
+   initOrderTab();
  });
  
  function closeForms() {

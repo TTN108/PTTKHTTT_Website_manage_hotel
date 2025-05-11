@@ -6,16 +6,18 @@ $conn = $db->conn;
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$ma_don = $data['Ma_don_dat_phong'];
+$ma_don    = $data['Ma_don_dat_phong'];
 $tong_tien = $data['Tong_tien'];
 $phong_ids = $data['phong'];
+$NVID      = $data['Ma_nhan_vien'];
+
 
 $conn->begin_transaction();
 
 try {
     // Thêm hóa đơn
-    $stmt = $conn->prepare("INSERT INTO hoa_don (Ma_don_dat_phong, Ma_nhan_vien, Tong_tien) VALUES (?, NULL, ?)");
-    $stmt->bind_param("id", $ma_don, $tong_tien);
+    $stmt = $conn->prepare("INSERT INTO hoa_don (Ma_don_dat_phong, Ma_nhan_vien, Tong_tien) VALUES (?, ?, ?)");
+    $stmt->bind_param("isd", $ma_don, $NVID, $tong_tien);
     $stmt->execute();
 
     $ma_hoa_don = $conn->insert_id;

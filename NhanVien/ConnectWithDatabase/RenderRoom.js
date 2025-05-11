@@ -10,6 +10,7 @@ let chi_tiet_hoa_don = [];
 let chi_tiet_phong_hoa_don = [];
 let don_dat_phong = [];
 let selectedRooms = [];
+let nhan_vien = [];
 let booking = {};
 async function fetchAllDataRoom() {
     phong = [];
@@ -23,9 +24,10 @@ async function fetchAllDataRoom() {
     don_dat_phong = [];
     chi_tiet_phong = [];
     selectedRooms = [];
+    nhan_vien = [];
     booking = {};
     try {
-        const [roomsRes, roomTypesRes, customersRes, invoicesRes, objectsRes, accountsRes, orderDetailRes, roomDetailsRes, applyFormRes, detailsRes] = await Promise.all([
+        const [roomsRes, roomTypesRes, customersRes, invoicesRes, objectsRes, accountsRes, orderDetailRes, roomDetailsRes, applyFormRes, detailsRes, staffsRes] = await Promise.all([
             fetch('ConnectWithDatabase/get_rooms.php'),
             fetch('ConnectWithDatabase/get_roomType.php'),
             fetch('ConnectWithDatabase/get_customers.php'),
@@ -35,14 +37,15 @@ async function fetchAllDataRoom() {
             fetch('ConnectWithDatabase/get_orderDetails.php'),
             fetch('ConnectWithDatabase/get_roomDetails.php'),
             fetch('ConnectWithDatabase/get_ApplyForm.php'),
-            fetch('ConnectWithDatabase/get_Details.php')
+            fetch('ConnectWithDatabase/get_Details.php'),
+            fetch('ConnectWithDatabase/get_staff.php')
         ]);
 
-        if (!roomsRes.ok || !roomTypesRes.ok || !customersRes.ok || !invoicesRes.ok || !objectsRes.ok || !accountsRes.ok || !orderDetailRes || !roomDetailsRes.ok || !applyFormRes.ok || !detailsRes.ok) {
+        if (!roomsRes.ok || !roomTypesRes.ok || !customersRes.ok || !invoicesRes.ok || !objectsRes.ok || !accountsRes.ok || !orderDetailRes || !roomDetailsRes.ok || !applyFormRes.ok || !detailsRes.ok || !staffsRes.ok) {
             throw new Error("Có lỗi khi fetch một trong các file PHP");
         }
 
-        const [roomsData, roomTypesData, customersData, invoicesData, objectsData, accountsData, orderDetailData, roomDetailsData, applyFormData, detailData] = await Promise.all([
+        const [roomsData, roomTypesData, customersData, invoicesData, objectsData, accountsData, orderDetailData, roomDetailsData, applyFormData, detailData, staffData] = await Promise.all([
             roomsRes.json(),
             roomTypesRes.json(),
             customersRes.json(),
@@ -52,7 +55,8 @@ async function fetchAllDataRoom() {
             orderDetailRes.json(),
             roomDetailsRes.json(),
             applyFormRes.json(),
-            detailsRes.json()
+            detailsRes.json(),
+            staffsRes.json()
         ]);
 
         // Lưu vào biến toàn cục hoặc dùng tiếp
@@ -76,93 +80,334 @@ async function fetchAllDataRoom() {
         console.log(don_dat_phong);
         chi_tiet_phong_hoa_don = detailData;
         console.log(chi_tiet_phong_hoa_don);
-        // Gọi render hoặc xử lý logic tiếp
-        renderHotelLayout();
+        nhan_vien = staffData;
+        console.log(nhan_vien);
     } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
     }
 }
-
-function renderHotelLayout() {
-    console.log(hoa_don);
-    const hotelLayout = document.getElementById('hotel-wrapper');
-    hotelLayout.innerHTML = ''; // Xóa nội dung cũ
-
-    // Nhóm phòng theo tầng (dựa vào chữ số đầu tiên trong ID sau chữ cái, ví dụ: P101 -> tầng 1)
-    const floors = {};
-    phong.forEach(room => {
-        const idMatch = room.ID.match(/\d+/); // lấy số trong ID
-        const floorNum = idMatch ? idMatch[0][0] : '0'; // lấy chữ số đầu tiên
-        if (!floors[floorNum]) {
-            floors[floorNum] = [];
-        }
-        floors[floorNum].push(room);
-    });
-
-    Object.keys(floors).sort().forEach(floorNum => {
-        const floorDiv = document.createElement('div');
-        floorDiv.classList.add('floor');
-
-        const roomRow = document.createElement('div');
-        roomRow.classList.add('room-row');
-
-        const floorTitle = document.createElement('div');
-        floorTitle.classList.add('floor-title');
-        floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
-        roomRow.appendChild(floorTitle);
-
-        const roomContainer = document.createElement('div');
-        roomContainer.classList.add('room-container');
-
-        floors[floorNum].forEach(room => {
-            const roomDiv = document.createElement('div');
-            let statusClass = room.Trang_thai === 'Trống' ? 'free'
-                : room.Trang_thai === 'Có người ở' ? 'occupied'
-                : room.Trang_thai === 'Đang dọn dẹp' ? 'cleaning'
-                : '';
-            roomDiv.classList.add('room', statusClass);
-            roomDiv.innerHTML = `<div class="room-title">${room.ID}</div>`;
-
-            if (room.Trang_thai === 'Có người ở') {
-                let ownerName = '';
-                const roomDetail = chi_tiet_hoa_don.find(r => r.Ma_phong === room.ID);
-                let hoaDonDetail = null;
-
-                if (roomDetail) {
-                    hoaDonDetail = hoa_don.find(d => d.Ma_Hoa_Don === roomDetail.Ma_Hoa_Don);
-                }
-
-                if (hoaDonDetail && hoaDonDetail.Ma_don_dat_phong) {
-                    const invoice = don_dat_phong.find(inv =>
-                        inv && inv.Trang_thai === "Đã nhận phòng" &&
-                        inv.Ma_don_dat_phong === hoaDonDetail.Ma_don_dat_phong
-                    );
-
-                    if (invoice && invoice.Account) {
-                        const accountInfo = account.find(acc => acc.Username === invoice.Account);
-                        if (accountInfo) {
-                            const customer = khach_hang.find(cust => cust.Account === accountInfo.Username);
-                            if (customer) {
-                                ownerName = customer.Ten;
-                            }
-                        }
-                    }
-                }
-
-                roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
-            }
-
-            roomContainer.appendChild(roomDiv);
-        });
-
-        roomRow.appendChild(roomContainer);
-        floorDiv.appendChild(roomRow);
-        hotelLayout.appendChild(floorDiv);
-    });
-
-    updateStatusBar(phong, loai_phong); // Gọi hàm cập nhật thanh trạng thái
+async function renderRoom () {
+  await fetchAllDataRoom();
+  renderHotelLayout();
 }
 
+function filterHotelLayout(filterType){
+  let filteredRooms = phong.filter(room => {
+    console.log(filterType);
+    if (filterType === 'Trống' || filterType === 'Có người ở' || filterType === 'Đang dọn dẹp') {
+      return room.Trang_thai === filterType;
+    } else if (filterType === 'Standard' || filterType === 'Deluxe') {
+      let roomType = loai_phong.find(rt => rt.Ma_Loai_Phong === room.Ma_Loai_Phong);
+      console.log(roomType);
+      return (roomType && roomType.Ten_loai === filterType);
+    }
+    return true;
+  });
+  console.log(filterType);
+  console.log(filteredRooms);
+  const floors = {};
+  filteredRooms.forEach(room => {
+    console.log(room.ID);
+    const floorNum = String(room.ID)[2];
+    if (!floors[floorNum]) {
+      floors[floorNum] = [];
+    }
+    floors[floorNum].push(room);
+  });
+  console.log(floors);
+  let thotelLayout = document.getElementById('hotel-wrapper');
+  thotelLayout.innerHTML = '';
+  Object.keys(floors).sort().forEach(floorNum => {
+    const floorDiv = document.createElement('div');
+    floorDiv.classList.add('floor');
+
+    const roomRow = document.createElement('div');
+    roomRow.classList.add('room-row');
+
+    const floorTitle = document.createElement('div');
+    floorTitle.classList.add('floor-title');
+    floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
+    roomRow.appendChild(floorTitle);
+
+    const roomContainer = document.createElement('div');
+    roomContainer.classList.add('room-container');
+
+    floors[floorNum].forEach(room => {
+      const roomDiv = document.createElement('div');
+      let statusClass = room.Trang_thai === 'Trống' ? 'free' : (room.Trang_thai === 'Có người ở' ? 'occupied' : (room.Trang_thai === 'Đang dọn dẹp' ? 'cleaning' : ''));
+      roomDiv.classList.add('room', statusClass);
+      console.log(room.ID);
+      roomDiv.innerHTML = `<div class="room-title">${room.ID}</div>`;
+      if (room.Trang_thai === 'Có người ở') {
+          console.log(room);
+          let ownerName = '';
+          const roomI = chi_tiet_hoa_don.find(r => r.Ma_phong === room.ID);
+          let detail = null;
+          if (roomI) {
+            detail = hoa_don.find(d => d.Ma_Hoa_Don === roomI.Ma_Hoa_Don);
+          }
+          console.log(detail);
+          console.log(detail.Ma_don_dat_phong);
+          const l = don_dat_phong.filter(inv => (
+            inv && inv.Trang_thai === "Đã nhận phòng"
+          ));
+          console.log(l);
+          console.log(l.Ma_don_dat_phong);
+          let invoice = don_dat_phong.find(inv => (
+              inv && (inv.Trang_thai === "Đã nhận phòng") && (inv.Ma_don_dat_phong === detail.Ma_don_dat_phong)
+            ));
+            console.log(invoice);
+            console.log(invoice.Account);
+          let Account = account.find(acc => acc.Username === invoice.Account);
+              console.log(Account);
+          let customer = khach_hang.find(cust => cust.Account === Account.Username);
+              if (customer) ownerName = customer.Ten;
+              console.log(customer);
+              console.log(ownerName);
+          roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
+      } 
+      roomContainer.appendChild(roomDiv);
+    });
+    roomRow.appendChild(roomContainer);
+    floorDiv.appendChild(roomRow);
+    thotelLayout.appendChild(floorDiv);
+  });
+}
+// // function renderHotelLayout() {
+//     console.log(hoa_don);
+//     const hotelLayout = document.getElementById('hotel-wrapper');
+//     hotelLayout.innerHTML = ''; // Xóa nội dung cũ
+
+//     // Nhóm phòng theo tầng (dựa vào chữ số đầu tiên trong ID sau chữ cái, ví dụ: P101 -> tầng 1)
+//     const floors = {};
+//     phong.forEach(room => {
+//         const idMatch = room.ID.match(/\d+/); // lấy số trong ID
+//         const floorNum = idMatch ? idMatch[0][1] : '0'; // lấy chữ số đầu tiên
+//         if (!floors[floorNum]) {
+//             floors[floorNum] = [];
+//         }
+//         floors[floorNum].push(room);
+//     });
+
+//     Object.keys(floors).sort().forEach(floorNum => {
+//         const floorDiv = document.createElement('div');
+//         floorDiv.classList.add('floor');
+
+//         const roomRow = document.createElement('div');
+//         roomRow.classList.add('room-row');
+
+//         const floorTitle = document.createElement('div');
+//         floorTitle.classList.add('floor-title');
+//         floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
+//         roomRow.appendChild(floorTitle);
+
+//         const roomContainer = document.createElement('div');
+//         roomContainer.classList.add('room-container');
+
+//         floors[floorNum].forEach(room => {
+//             const roomDiv = document.createElement('div');
+//             let statusClass = room.Trang_thai === 'Trống' ? 'free'
+//                 : room.Trang_thai === 'Có người ở' ? 'occupied'
+//                 : room.Trang_thai === 'Đang dọn dẹp' ? 'cleaning'
+//                 : '';
+//             roomDiv.classList.add('room', statusClass);
+//             roomDiv.innerHTML = `<div class="room-title">${room.ID}</div>`;
+
+//             if (room.Trang_thai === 'Có người ở') {
+//                 let ownerName = '';
+//                 const roomDetail = chi_tiet_hoa_don.find(r => r.Ma_phong === room.ID);
+//                 let hoaDonDetail = null;
+
+//                 if (roomDetail) {
+//                     hoaDonDetail = hoa_don.find(d => d.Ma_Hoa_Don === roomDetail.Ma_Hoa_Don);
+//                 }
+
+//                 if (hoaDonDetail && hoaDonDetail.Ma_don_dat_phong) {
+//                     const invoice = don_dat_phong.find(inv =>
+//                         inv && inv.Trang_thai === "Đã nhận phòng" &&
+//                         inv.Ma_don_dat_phong === hoaDonDetail.Ma_don_dat_phong
+//                     );
+
+//                     if (invoice && invoice.Account) {
+//                         const accountInfo = account.find(acc => acc.Username === invoice.Account);
+//                         if (accountInfo) {
+//                             const customer = khach_hang.find(cust => cust.Account === accountInfo.Username);
+//                             if (customer) {
+//                                 ownerName = customer.Ten;
+//                             }
+//                         }
+//                     }
+//                 }
+
+//                 roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
+//             }
+
+//             roomContainer.appendChild(roomDiv);
+//         });
+
+//         roomRow.appendChild(roomContainer);
+//         floorDiv.appendChild(roomRow);
+//         hotelLayout.appendChild(floorDiv);
+//     });
+
+//     updateStatusBar(phong, loai_phong); // Gọi hàm cập nhật thanh trạng thái
+// }
+
+// function renderHotelLayout() {
+//   const hotelLayout = document.getElementById('hotel-wrapper');
+//   hotelLayout.innerHTML = '';
+//   const floors = {};
+//   phong.forEach(room => {
+//     const idMatch = room.ID.match(/\d+/);
+//     const floorNum = idMatch ? idMatch[0][1] : '0';
+//     if (!floors[floorNum]) {
+//       floors[floorNum] = [];
+//     }
+//     floors[floorNum].push(room);
+//   });
+
+//   Object.keys(floors).sort().forEach(floorNum => {
+//     const floorDiv = document.createElement('div');
+//     floorDiv.classList.add('floor');
+
+//     const roomRow = document.createElement('div');
+//     roomRow.classList.add('room-row');
+
+//     const floorTitle = document.createElement('div');
+//     floorTitle.classList.add('floor-title');
+//     floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
+//     roomRow.appendChild(floorTitle);
+
+//     const roomContainer = document.createElement('div');
+//     roomContainer.classList.add('room-container');
+
+//     floors[floorNum].forEach(room => {
+//       const roomDiv = document.createElement('div');
+//       let statusClass = room.Trang_thai === 'Trống' ? 'free'
+//         : room.Trang_thai === 'Có người ở' ? 'occupied'
+//         : room.Trang_thai === 'Đang dọn dẹp' ? 'cleaning'
+//         : '';
+//       roomDiv.classList.add('room', statusClass);
+//       roomDiv.innerHTML = `<div class="room-title">${room.ID}</div>`;
+
+//       if (room.Trang_thai === 'Có người ở') {
+//         let ownerName = '';
+//         const roomDetail = chi_tiet_hoa_don.find(r => r.Ma_phong === room.ID);
+//         console.log("Mã phòng: " + roomDetail.Ma_phong);
+//         if (roomDetail) {
+//           const hoaDonDetail = hoa_don.find(d => d.Ma_Hoa_Don === roomDetail.Ma_Hoa_Don);
+//           console.log(hoaDonDetail);
+//           console.log(hoaDonDetail.Ma_don_dat_phong);
+//           if (hoaDonDetail && hoaDonDetail.Ma_don_dat_phong) {
+//             const invoice = don_dat_phong.find(inv =>
+//               inv.Ma_don_dat_phong === hoaDonDetail.Ma_don_dat_phong && inv.Trang_thai === "Đã nhận phòng"
+//             );
+//             console.log(invoice);
+//             console.log("Mã đơn đặt phòng: " + invoice.Ma_don_dat_phong);
+//             if (invoice && invoice.Account) {
+//               const accountInfo = account.find(acc => acc.Username === invoice.Account);
+//               console.log("Tài khoản: " + accountInfo);
+//               if (accountInfo) {
+//                 const customer = khach_hang.find(cust => cust.Account === accountInfo.Username);
+//                 console.log("Khách " + customer.Ten);
+//                 if (customer) {
+//                   ownerName = customer.Ten;
+//                 }
+//               }
+//             }
+//           }
+//         }
+//         console.log("Người đặt: " + ownerName);
+//         roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
+//       }
+//       roomContainer.appendChild(roomDiv);
+//     });
+
+//     roomRow.appendChild(roomContainer);
+//     floorDiv.appendChild(roomRow);
+//     hotelLayout.appendChild(floorDiv);
+//   });
+//   updateStatusBar(phong, loai_phong);
+// }
+function renderHotelLayout() {
+  const hotelLayout = document.getElementById('hotel-wrapper');
+  hotelLayout.innerHTML = '';
+  const floors = {};
+
+  phong.forEach(room => {
+    const idMatch = room.ID.match(/\d+/);
+    const floorNum = idMatch ? idMatch[0][1] : '0';
+    if (!floors[floorNum]) {
+      floors[floorNum] = [];
+    }
+    floors[floorNum].push(room);
+  });
+
+  Object.keys(floors).sort().forEach(floorNum => {
+    const floorDiv = document.createElement('div');
+    floorDiv.classList.add('floor');
+
+    const roomRow = document.createElement('div');
+    roomRow.classList.add('room-row');
+
+    const floorTitle = document.createElement('div');
+    floorTitle.classList.add('floor-title');
+    floorTitle.innerHTML = `<p>Floor ${floorNum}</p>`;
+    roomRow.appendChild(floorTitle);
+
+    const roomContainer = document.createElement('div');
+    roomContainer.classList.add('room-container');
+
+    floors[floorNum].forEach(room => {
+      const roomDiv = document.createElement('div');
+      let statusClass = room.Trang_thai === 'Trống' ? 'free'
+        : room.Trang_thai === 'Có người ở' ? 'occupied'
+        : room.Trang_thai === 'Đang dọn dẹp' ? 'cleaning'
+        : '';
+      roomDiv.classList.add('room', statusClass);
+      roomDiv.innerHTML = `<div class="room-title">${room.ID}</div>`;
+
+      if (room.Trang_thai === 'Có người ở') {
+        let ownerName = '';
+        const roomDetails = chi_tiet_hoa_don.filter(r => r.Ma_phong === room.ID);
+
+        for (const detail of roomDetails) {
+          const hoaDonDetail = hoa_don.find(d => d.Ma_Hoa_Don === detail.Ma_Hoa_Don);
+          if (!hoaDonDetail || !hoaDonDetail.Ma_don_dat_phong) continue;
+
+          const invoice = don_dat_phong.find(inv =>
+            inv && inv.Ma_don_dat_phong === hoaDonDetail.Ma_don_dat_phong &&
+            inv.Trang_thai === "Đã nhận phòng"
+          );
+          if (!invoice || !invoice.Account) continue;
+
+          const accountInfo = account.find(acc => acc.Username === invoice.Account);
+          if (!accountInfo) continue;
+
+          const customer = khach_hang.find(cust => cust.Account === accountInfo.Username);
+          if (customer && customer.Ten) {
+            ownerName = customer.Ten;
+            break; // tìm thấy phù hợp → dừng
+          }
+        }
+
+        if (!ownerName) {
+          console.warn(`⚠️ Không tìm thấy khách cho phòng ${room.ID}`);
+        }
+
+        roomDiv.innerHTML += `<div class="room-owner">${ownerName}</div>`;
+      }
+
+      roomContainer.appendChild(roomDiv);
+    });
+
+    roomRow.appendChild(roomContainer);
+    floorDiv.appendChild(roomRow);
+    hotelLayout.appendChild(floorDiv);
+  });
+
+  updateStatusBar(phong, loai_phong);
+}
 function updateStatusBar(rooms, roomTypes) {
     if (!rooms || !roomTypes) {
         console.warn("Không có dữ liệu phòng hoặc loại phòng để cập nhật status bar.");
@@ -240,6 +485,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function selectRoomsForBooking(booking) {
+    document.getElementById("back-to-booking-list").addEventListener("click", function () {
+      document.getElementById("form-checkin").style.display = "none";
+      document.getElementById("booking-list-modal").style.display = "block";
+    });
     const availableRooms = phong.filter(p =>
       p.Trang_thai === 'Trống' && p.Ma_Loai_Phong === booking.Ma_Loai_Phong
     );
@@ -249,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookingIdSpan = document.getElementById('current-booking-id');
   
     container.innerHTML = '';
-    bookingIdSpan.textContent = booking.Ma_don_dat_phong;
+    bookingIdSpan.textContent = booking.Ma_don_dat_phong + ' Số lượng phòng: ' + booking.So_luong_phong;
   
     availableRooms.forEach(room => {
       const btn = document.createElement('button');
@@ -296,6 +545,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (roomType) {
         totalAmount = roomType.Gia * booking.So_luong_phong;
     }  
+    const nv = nhan_vien.find(nv => nv.Account === currentUsername);
+    idNV = nv.Ma_nhan_vien;
     try {
       const res = await fetch('ConnectWithDatabase/ConfirmBooking.php', {
         method: 'POST',
@@ -303,7 +554,8 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({
           Ma_don_dat_phong: booking.Ma_don_dat_phong,
           Tong_tien: totalAmount,
-          phong: selectedRoomIds
+          phong: selectedRoomIds,
+          Ma_nhan_vien: idNV
         })
       });
       
@@ -322,7 +574,10 @@ document.addEventListener('DOMContentLoaded', () => {
           alert('✅ Đã nhận phòng thành công');
           document.querySelector('#form-checkin').style.display = 'none';
           document.querySelector('#form-new-booking').style.display = 'none';
-          fetchAllDataRoom();
+          //await fetchAllDataRoom();
+          renderRoom();
+          updateCheckOutButton();
+          checkForCheckOut();
           const remaining = don_dat_phong.filter(don =>
             !hoa_don.some(hd => hd.Ma_don_dat_phong === don.Ma_don_dat_phong)
           );
@@ -342,176 +597,476 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  function showNewBookingForm() {
-    const form = document.querySelector('#form-new-booking');
-    const roomTypeSelect = form.querySelector('#select-room-type');
-    let selectedRooms = []; // ✅ Khai báo ở ngoài
+  // async function showNewBookingForm() {
+  //   const form = document.querySelector('#form-new-booking');
+  //   const roomTypeSelect = form.querySelector('#select-room-type');
+  //   const newCustomerFields = form.querySelector('#new-customer-fields');
+  //   const inputCCCD = form.querySelector('input[name="CCCD"]');
+  //   const inputUsername = form.querySelector('input[name="username"]');
+  //   let selectedRooms = [];
 
-    roomTypeSelect.innerHTML = '';
-    loai_phong.forEach((lp, index) => {
-      const opt = document.createElement('option');
-      opt.value = lp.Ma_Loai_Phong;
-      opt.textContent = lp.Ten_loai;
+  //   // Reset
+  //   roomTypeSelect.innerHTML = '';
+  //   loai_phong.forEach((lp, index) => {
+  //     const opt = document.createElement('option');
+  //     opt.value = lp.Ma_Loai_Phong;
+  //     opt.textContent = lp.Ten_loai;
+  //     if (index === 0) opt.selected = true;
+  //     roomTypeSelect.appendChild(opt);
+  //   });
 
-      // ✅ Gán selected cho option đầu tiên
-      if (index === 0) opt.selected = true;
+  //   showFormWithDelay('form-new-booking');
+  //   form.style.display = 'block';
+  //   renderRooms();
 
-      roomTypeSelect.appendChild(opt);
-    });
-    showFormWithDelay('form-new-booking');
-    form.style.display = 'block';
-    // ✅ Gọi sau khi option đã đầy đủ và có selected value
-    renderRooms();
-    roomTypeSelect.addEventListener('change', renderRooms);
+  //   roomTypeSelect.addEventListener('change', renderRooms);
 
-  function renderRooms() {
-    const selectedType = roomTypeSelect.value;
-    const availableRooms = phong.filter(p =>
-      p.Trang_thai === 'Trống' && p.Ma_Loai_Phong === selectedType
-    );
-    const roomContainer = form.querySelector('#available-rooms-manual');
-    selectedRooms = [];
-    roomContainer.innerHTML = '';
+  //   function renderRooms() {
+  //     const selectedType = roomTypeSelect.value;
+  //     const availableRooms = phong.filter(p =>
+  //       p.Trang_thai === 'Trống' && p.Ma_Loai_Phong === selectedType
+  //     );
+  //     const roomContainer = form.querySelector('#available-rooms-manual');
+  //     selectedRooms = [];
+  //     roomContainer.innerHTML = '';
 
-      availableRooms.forEach(room => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.value = room.ID;
-        btn.textContent = `Phòng ${room.ID}`;
-        btn.addEventListener('click', function (e) {
-          e.preventDefault();
-          const index = selectedRooms.indexOf(room.ID);
-          if (index !== -1) {
-            selectedRooms.splice(index, 1);
-            btn.classList.remove('selected');
-          } else {
-            const quantity = parseInt(document.querySelector('input[name="So_luong_phong"]').value);
-            if (selectedRooms.length >= quantity) {
-              alert('Không thể chọn nhiều hơn số lượng phòng đã nhập!');
-              return;
-            }
-            selectedRooms.push(room.ID);
-            btn.classList.add('selected');
-          }
-        });
-        roomContainer.appendChild(btn);
-      });
+  //     availableRooms.forEach(room => {
+  //       const btn = document.createElement('button');
+  //       btn.type = 'button';
+  //       btn.value = room.ID;
+  //       btn.textContent = `Phòng ${room.ID}`;
+  //       btn.addEventListener('click', function (e) {
+  //         e.preventDefault();
+  //         const index = selectedRooms.indexOf(room.ID);
+  //         if (index !== -1) {
+  //           selectedRooms.splice(index, 1);
+  //           btn.classList.remove('selected');
+  //         } else {
+  //           const quantity = parseInt(form.querySelector('input[name="So_luong_phong"]').value);
+  //           if (selectedRooms.length >= quantity) {
+  //             alert('Không thể chọn nhiều hơn số lượng phòng đã nhập!');
+  //             return;
+  //           }
+  //           selectedRooms.push(room.ID);
+  //           btn.classList.add('selected');
+  //         }
+  //       });
+  //       roomContainer.appendChild(btn);
+  //     });
+  //   }
+
+  //   // ✅ Kiểm tra xem CCCD và username có tồn tại không
+  //   function checkExistingUser() {
+  //       const cccd = inputCCCD.value.trim();
+  //       const username = inputUsername.value.trim();
+  //       const kh = khach_hang.find(kh => kh.CCCD === cccd);
+  //       const acc = account.find(acc => acc.Username === username);
+      
+  //       if (!cccd || !username) {
+  //         newCustomerFields.style.display = 'none';
+  //         return;
+  //       }
+      
+  //       if (kh && acc) {
+  //         if (kh.Account === acc.Username) {
+  //           // CCCD và Username thuộc cùng người => ẩn form nhập thông tin mới
+  //           newCustomerFields.style.display = 'none';
+  //         } else {
+  //           // Trùng nhưng không cùng người
+  //           alert("⚠️ CCCD và Username không thuộc cùng một người!");
+  //           newCustomerFields.style.display = 'none';
+  //         }
+  //       } else if (!kh && !acc) {
+  //         // Cả hai đều mới => hiển thị form nhập thông tin khách
+  //         newCustomerFields.style.display = 'block';
+  //       } else {
+  //         // Một trong hai đã tồn tại => không được nhập thêm thông tin mới
+  //         newCustomerFields.style.display = 'none';
+  //       }
+  //   }
+
+  //   // ✅ Gắn sự kiện kiểm tra mỗi khi thay đổi CCCD hoặc username
+  //   inputCCCD.addEventListener('input', checkExistingUser);
+  //   inputUsername.addEventListener('input', checkExistingUser);
+
+  
+  //   form.querySelector('#confirm-manual-booking').addEventListener('click', async () => {
+  //     const data = new FormData(form.querySelector('form'));
+  
+  //     const cccd = data.get('CCCD');
+  //     const username = data.get('username');
+  //     const isCCCDExist = khach_hang.some(kh => kh.CCCD === cccd);
+  //     const isUsernameExist = account.some(acc => acc.Username === username);
+  
+  //     const customerName = data.get('Ten_khach');
+  //     const password = data.get('password');
+  //     const email = data.get('email');
+  //     const phone = data.get('phone');
+  //     const address = data.get('address');
+  //     const quantity = parseInt(data.get('So_luong_phong'));
+  //     const people = parseInt(data.get('So_luong_nguoi'));
+  //     const ngayTra = data.get('Ngay_tra');
+  //     const maLoaiPhong = data.get('Ma_loai_phong');
+  
+  //     if (!cccd || !username || !ngayTra || !maLoaiPhong) {
+  //       alert('Vui lòng nhập đầy đủ thông tin bắt buộc!');
+  //       return;
+  //     }
+  
+  //     if (!isCCCDExist && !isUsernameExist) {
+  //       if (!customerName || !password || !email || !phone || !address) {
+  //         alert('Vui lòng nhập đầy đủ thông tin khách hàng!');
+  //         return;
+  //       }
+  //       if (!/^\d{9}$|^\d{12}$/.test(cccd)) {
+  //         alert('CCCD phải gồm 9 hoặc 12 chữ số!');
+  //         return;
+  //       }
+  //       if (!/^\d{10,11}$/.test(phone)) {
+  //         alert('Số điện thoại phải có 10-11 chữ số!');
+  //         return;
+  //       }
+  //       if (!/^\S+@\S+\.\S+$/.test(email)) {
+  //         alert('Email không hợp lệ!');
+  //         return;
+  //       }
+  //     }
+  
+  //     const now = new Date();
+  //     now.setHours(0, 0, 0, 0);  // Đặt giờ về 00:00:00
+
+  //     const dateNgayTra = new Date(ngayTra);
+  //     dateNgayTra.setHours(0, 0, 0, 0);
+
+  //     if (dateNgayTra < now) {
+  //       alert('Ngày trả không thể trước hôm nay!');
+  //       return;
+  //     }
+  
+  //     if (selectedRooms.length !== quantity) {
+  //       alert('Số lượng phòng chưa đủ');
+  //       return;
+  //     }
+  
+  //     const ngayDat = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  //     const ngayNhan = ngayDat;
+  
+  //     let Account = { Username: username };
+  //     let khachHang = { CCCD: cccd };
+  //     if (!isUsernameExist && !isCCCDExist) {
+  //       Account = {
+  //         Username: username,
+  //         Password: password,
+  //         Email: email,
+  //         Status: 'Hoạt động'
+  //       };
+  //       account.push(Account);
+  
+  //       khachHang = {
+  //         CCCD: cccd,
+  //         Ten: customerName,
+  //         SDT: phone,
+  //         Dia_chi: address,
+  //         Account: Account.Username
+  //       };
+  //       khach_hang.push(khachHang);
+  //     }
+  
+  //     const donDat = {
+  //       Account: Account.Username,
+  //       Ngay_nhan: ngayNhan,
+  //       Ngay_tra: ngayTra,
+  //       So_luong_phong: quantity,
+  //       So_luong_nguoi: people,
+  //       Ma_Loai_Phong: maLoaiPhong,
+  //       Ngay_dat: ngayDat,
+  //       Trang_thai: 'Đã nhận phòng'
+  //     };
+  //     don_dat_phong.push(donDat);
+  
+  //     let total = 0.0;
+  //     selectedRooms.forEach(roomID => {
+  //       const room = phong.find(p => p.ID === roomID);
+  //       const roomType = loai_phong.find(rt => rt.Ma_Loai_Phong === room.Ma_Loai_Phong);
+  //       total += roomType.Gia;
+  //     });
+  //     const nv = nhan_vien.find(nv => nv.Account === currentUsername);
+  //     idNV = nv.Ma_nhan_vien;
+  //     try {
+  //       const res = await fetch('ConnectWithDatabase/insert_checkin.php', {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify({
+  //           account: isUsernameExist ? null : Account,
+  //           customer: isCCCDExist ? null : khachHang,
+  //           booking: donDat,
+  //           phong: selectedRooms,
+  //           Gia: total,
+  //           Ma_nhan_vien: idNV
+  //         })
+  //       });
+  //       const result = await res.json();
+  //       if (result.success) {
+  //         alert("✅ Đã nhận phòng thành công.");
+  //         form.querySelectorAll('input, select').forEach(input => {
+  //           if (input.type === 'checkbox' || input.type === 'radio') {
+  //             input.checked = false;
+  //           } else {
+  //             input.value = '';
+  //           }
+  //         });
+          
+  //         // Ẩn vùng nhập thông tin khách hàng mới
+  //         newCustomerFields.style.display = 'none';
+          
+  //         // Xoá vùng chọn phòng (nếu có)
+  //         const manualRoomContainer = form.querySelector('#available-rooms-manual');
+  //         if (manualRoomContainer) manualRoomContainer.innerHTML = '';
+          
+  //         // Xoá các nút phòng đã chọn
+  //         form.querySelectorAll('.room-button.selected').forEach(btn => btn.classList.remove('selected'));
+  //         selectedRooms = [];
+  //         form.style.display = 'none';
+  //         await fetchAllDataRoom();
+  //         updateCheckOutButton();
+  //         checkForCheckOut();
+  //       } else {
+  //         alert("❌ Có lỗi khi lưu: " + result.message);
+  //       }
+  //     } catch (err) {
+  //       console.error(err);
+  //       alert("❌ Lỗi kết nối đến server.");
+  //     }
+  //   });
+  // }
+  async function showNewBookingForm() {
+  const step1 = document.getElementById("form-new-booking-step1");
+  const step2 = document.getElementById("form-new-booking-step2");
+  const roomTypeSelect = step1.querySelector('#select-room-type');
+  const form = step1.querySelector("#manual-booking-data");
+  const newCustomerFields = form.querySelector("#new-customer-fields");
+  const inputCCCD = form.querySelector('input[name="CCCD"]');
+  const inputUsername = form.querySelector('input[name="username"]');
+  let selectedRooms = [];
+
+  step1.style.display = "block";
+  step2.style.display = "none";
+
+  roomTypeSelect.innerHTML = '';
+  loai_phong.forEach((lp, index) => {
+    const opt = document.createElement("option");
+    opt.value = lp.Ma_Loai_Phong;
+    opt.textContent = lp.Ten_loai;
+    if (index === 0) opt.selected = true;
+    roomTypeSelect.appendChild(opt);
+  });
+
+  function checkExistingUser() {
+    const cccd = inputCCCD.value.trim();
+    const username = inputUsername.value.trim();
+    const kh = khach_hang.find(kh => kh.CCCD === cccd);
+    const acc = account.find(acc => acc.Username === username);
+
+    if (!cccd || !username) {
+      newCustomerFields.style.display = 'none';
+      return;
     }
-    form.querySelector('#confirm-manual-booking').addEventListener('click', async () => {
-      const data = new FormData(form.querySelector('form'));
-  
-      // Các giá trị form
-      const customerName = data.get('Ten_khach');
-      const cccd = data.get('CCCD');
-      const username = data.get('username');
-      const password = data.get('password');
-      const email = data.get('email');
-      const phone = data.get('phone');
-      const address = data.get('address');
-      const quantity = parseInt(data.get('So_luong_phong'));
-      const people = parseInt(data.get('So_luong_nguoi'));
-      const ngayTra = data.get('Ngay_tra');
-      const maLoaiPhong = data.get('Ma_loai_phong');
-      // Kiểm tra ràng buộc dữ liệu
-      if (!customerName || !cccd || !username || !password || !email || !phone || !address || !ngayTra || !maLoaiPhong) {
-        alert('Vui lòng nhập đầy đủ thông tin!');
+
+    if (kh && acc && kh.Account === acc.Username) {
+      newCustomerFields.style.display = 'none';
+    } else if (!kh && !acc) {
+      newCustomerFields.style.display = 'block';
+    } else {
+      alert("⚠️ CCCD và Username không thuộc cùng một người!");
+      newCustomerFields.style.display = 'none';
+    }
+  }
+
+  inputCCCD.addEventListener("input", checkExistingUser);
+  inputUsername.addEventListener("input", checkExistingUser);
+
+  // Chuyển sang bước 2
+  document.getElementById("to-step2").onclick = () => {
+    const quantity = parseInt(form.querySelector('input[name="So_luong_phong"]').value);
+    const selectedType = roomTypeSelect.value;
+    const availableRooms = phong.filter(p => p.Trang_thai === 'Trống' && p.Ma_Loai_Phong === selectedType);
+
+    if (availableRooms.length === 0) {
+      alert("Không còn phòng phù hợp!");
+      return;
+    }
+
+    const roomContainer = document.getElementById("available-rooms-manual");
+    roomContainer.innerHTML = '';
+    selectedRooms = [];
+
+    availableRooms.forEach(room => {
+      const btn = document.createElement("button");
+      btn.textContent = `Phòng ${room.ID}`;
+      btn.classList.add("room-button");
+      btn.type = "button";
+
+      btn.addEventListener("click", () => {
+        const index = selectedRooms.indexOf(room.ID);
+        if (index !== -1) {
+          selectedRooms.splice(index, 1);
+          btn.classList.remove("selected");
+        } else {
+          if (selectedRooms.length >= quantity) {
+            alert("Không thể chọn nhiều hơn số lượng phòng đã nhập!");
+            return;
+          }
+          selectedRooms.push(room.ID);
+          btn.classList.add("selected");
+        }
+      });
+
+      roomContainer.appendChild(btn);
+    });
+
+    step1.style.display = "none";
+    step2.style.display = "block";
+  };
+
+  // Quay lại bước 1
+  document.getElementById("back-to-step1").onclick = () => {
+    step1.style.display = "block";
+    step2.style.display = "none";
+  };
+
+  // Xác nhận đặt phòng
+  document.getElementById("confirm-manual-booking").addEventListener("click", async () => {
+    const data = new FormData(form);
+    const cccd = data.get("CCCD");
+    const username = data.get("username");
+    const isCCCDExist = khach_hang.some(kh => kh.CCCD === cccd);
+    const isUsernameExist = account.some(acc => acc.Username === username);
+
+    const customerName = data.get("Ten_khach");
+    const password = data.get("password");
+    const email = data.get("email");
+    const phone = data.get("phone");
+    const address = data.get("address");
+    const quantity = parseInt(data.get("So_luong_phong"));
+    const people = parseInt(data.get("So_luong_nguoi"));
+    const ngayTra = data.get("Ngay_tra");
+    const maLoaiPhong = data.get("Ma_loai_phong");
+
+    if (!cccd || !username || !ngayTra || !maLoaiPhong) {
+      alert("Vui lòng nhập đầy đủ thông tin bắt buộc!");
+      return;
+    }
+
+    if (!isCCCDExist && !isUsernameExist) {
+      if (!customerName || !password || !email || !phone || !address) {
+        alert("Vui lòng nhập đầy đủ thông tin khách hàng!");
         return;
       }
-
       if (!/^\d{9}$|^\d{12}$/.test(cccd)) {
-        alert('CCCD phải gồm 9 hoặc 12 chữ số!');
+        alert("CCCD phải gồm 9 hoặc 12 chữ số!");
         return;
       }
-
       if (!/^\d{10,11}$/.test(phone)) {
-        alert('Số điện thoại phải có 10-11 chữ số!');
+        alert("Số điện thoại phải có 10-11 chữ số!");
         return;
-      } 
-
+      }
       if (!/^\S+@\S+\.\S+$/.test(email)) {
-        alert('Email không hợp lệ!');
+        alert("Email không hợp lệ!");
         return;
       }
+    }
 
-      const now = new Date();
-      const dateNgayTra = new Date(ngayTra);
-      if (dateNgayTra < now) {
-        alert('Ngày trả phải sau ngày hiện tại!');
-        return;
-      }
-      if (selectedRooms.length !== quantity) {
-        alert('Số lượng phòng chưa đủ');
-        return;
-      }
-  
-      const ngayDat = new Date().toISOString().slice(0, 19).replace('T', ' ');
-      const ngayNhan = ngayDat;
-  
-      const Account = {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const dateNgayTra = new Date(ngayTra);
+    dateNgayTra.setHours(0, 0, 0, 0);
+    if (dateNgayTra < now) {
+      alert("Ngày trả không thể trước hôm nay!");
+      return;
+    }
+
+    if (selectedRooms.length !== quantity) {
+      alert("Số lượng phòng chưa khớp với lựa chọn!");
+      return;
+    }
+
+    const ngayDat = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const ngayNhan = ngayDat;
+
+    let Account = { Username: username };
+    let khachHang = { CCCD: cccd };
+    if (!isUsernameExist && !isCCCDExist) {
+      Account = {
         Username: username,
         Password: password,
         Email: email,
-        Status: 'Hoạt động'
+        Status: "Hoạt động",
       };
       account.push(Account);
-  
-      const khachHang = {
+      khachHang = {
         CCCD: cccd,
         Ten: customerName,
         SDT: phone,
         Dia_chi: address,
-        Account: Account.Username
+        Account: Account.Username,
       };
       khach_hang.push(khachHang);
-  
-      const donDat = {
-        Account: Account.Username,
-        Ngay_nhan: ngayNhan,
-        Ngay_tra: ngayTra,
-        So_luong_phong: quantity,
-        So_luong_nguoi: people,
-        Ma_Loai_Phong: maLoaiPhong,
-        Ngay_dat: ngayDat,
-        Trang_thai: 'Đã nhận phòng'
-      };
-      don_dat_phong.push(donDat);
-  
-      console.log(selectedRooms);
-  
-      let total = 0.0;
-      selectedRooms.forEach(roomID => {
-        const room = phong.find(p => p.ID === roomID);
-        const roomType = loai_phong.find(rt => rt.Ma_Loai_Phong === room.Ma_Loai_Phong);
-        total += roomType.Gia;
-      });
-      console.log(selectedRooms);
-      try {
-        const res = await fetch('ConnectWithDatabase/insert_checkin.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            account: Account,
-            customer: khachHang,
-            booking: donDat,
-            phong: selectedRooms,
-            Gia: total
-          })
-        });
-        const result = await res.json();
-        if (result.success) {
-          alert("✅ Đã thêm khách hàng và nhận phòng thành công.");
-          form.style.display = 'none';
-          fetchAllDataRoom();
-        } else {
-          alert("❌ Có lỗi khi lưu vào cơ sở dữ liệu: " + result.message);
-        }
-      } catch (err) {
-        console.error(err);
-        alert("❌ Lỗi kết nối đến server.");
-      }
+    }
+
+    const donDat = {
+      Account: Account.Username,
+      Ngay_nhan: ngayNhan,
+      Ngay_tra: ngayTra,
+      So_luong_phong: quantity,
+      So_luong_nguoi: people,
+      Ma_Loai_Phong: maLoaiPhong,
+      Ngay_dat: ngayDat,
+      Trang_thai: "Đã nhận phòng",
+    };
+    don_dat_phong.push(donDat);
+
+    let total = 0.0;
+    selectedRooms.forEach(roomID => {
+      const room = phong.find(p => p.ID === roomID);
+      const roomType = loai_phong.find(rt => rt.Ma_Loai_Phong === room.Ma_Loai_Phong);
+      total += roomType.Gia;
     });
-  }
-  
+
+    const nv = nhan_vien.find(nv => nv.Account === currentUsername);
+    const idNV = nv.Ma_nhan_vien;
+
+    try {
+      const res = await fetch("ConnectWithDatabase/insert_checkin.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          account: isUsernameExist ? null : Account,
+          customer: isCCCDExist ? null : khachHang,
+          booking: donDat,
+          phong: selectedRooms,
+          Gia: total,
+          Ma_nhan_vien: idNV,
+        }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert("✅ Đặt phòng thành công.");
+        step1.style.display = "none";
+        step2.style.display = "none";
+        selectedRooms = [];
+        //await fetchAllDataRoom();
+        renderRoom();
+        updateCheckOutButton();
+        checkForCheckOut();
+      } else {
+        alert("❌ Lỗi khi lưu: " + result.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("❌ Lỗi kết nối đến server.");
+    }
+  });
+} 
   
   async function delayBooking(bookedList) {
     // Tìm hóa đơn tương ứng
@@ -559,48 +1114,112 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 12000);
       });
   
-      fetchAllDataRoom(); // load lại dữ liệu phòng
+      renderRoom();
+      //fetchAllDataRoom(); // load lại dữ liệu phòng
     } else {
       alert('❌ Lỗi khi lưu trả phòng: ' + result.message);
     }
   }
   
-  function checkForCheckOut() {
+  async function checkForCheckOut() {
+    //await fetchAllDataRoom();
+    renderRoom();
     const today = new Date();
     const checkOutBtn = document.getElementById('checkOutBtn');
-  
+
     // Lọc những booking đến hạn trả phòng hôm nay
     const availableBookings = don_dat_phong.filter(p => {
-      if (p.Trang_thai !== 'Đã nhận phòng') return false;
-      const due = new Date(p.Ngay_tra);
-      return due.toDateString() === today.toDateString() &&
-        hoa_don.some(h => h.Ma_don_dat_phong === p.Ma_don_dat_phong);
+        if (p.Trang_thai !== 'Đã nhận phòng') return false;
+        const due = new Date(p.Ngay_tra);
+        return due.toDateString() === today.toDateString() &&
+            hoa_don.some(h => h.Ma_don_dat_phong === p.Ma_don_dat_phong);
     });
-  
+
     // Lọc những booking quá hạn
     const delayBookings = don_dat_phong.filter(p => {
-      if (p.Trang_thai !== 'Đã nhận phòng') return false;
-      const due = new Date(p.Ngay_tra);
-      return due < today &&
-        hoa_don.some(h => h.Ma_don_dat_phong === p.Ma_don_dat_phong);
+        if (p.Trang_thai !== 'Đã nhận phòng') return false;
+        const due = new Date(p.Ngay_tra);
+        return due < today && hoa_don.some(h => h.Ma_don_dat_phong === p.Ma_don_dat_phong);
     });
-  
+
     // Cập nhật trạng thái nút
     checkOutBtn.disabled = availableBookings.length === 0;
-  
+
     // Thiết lập sự kiện click một lần
     if (availableBookings.length > 0 && !checkOutBtn._listenerAdded) {
-      checkOutBtn.addEventListener('click', () => {
-        showCheckOutList(availableBookings);
-        document.getElementById('checkout-list').style.display = 'block';
-        showFormWithDelay('checkout-list');
-      });
-      checkOutBtn._listenerAdded = true;
+        checkOutBtn.addEventListener('click', () => {
+            showCheckOutList(availableBookings);
+            document.getElementById('checkout-list').style.display = 'block';
+            showFormWithDelay('checkout-list');
+        });
+        checkOutBtn._listenerAdded = true;
     }
-  
+
     // Xử lý tự động trả phòng trễ
     delayBookings.forEach(b => delayBooking(b));
+}
+
+
+async function delayBooking(bookedList) {
+  // Tìm hóa đơn tương ứng
+  const invoice = hoa_don.find(p => p.Ma_don_dat_phong === bookedList.Ma_don_dat_phong);
+  if (!invoice) return;  // không có hóa đơn thì dừng
+
+  // Lấy chi tiết hóa đơn
+  const details = chi_tiet_hoa_don.filter(p => p.Ma_Hoa_Don === invoice.Ma_Hoa_Don);
+  if (details.length === 0) return;
+
+  // Kiểm tra ngày trả phòng
+  const dueDate = new Date(bookedList.Ngay_tra);
+  const today = new Date();
+  if (dueDate.toDateString() === today.toDateString()) {
+      return; // Không thực hiện trả phòng tự động nếu ngày trả là hôm nay
   }
+
+  // Gửi yêu cầu lên server
+  let result;
+  try {
+      const res = await fetch('ConnectWithDatabase/insert_checkoutAuto.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              Ma_don_dat_phong: bookedList.Ma_don_dat_phong,
+              phong: details
+          })
+      });
+      result = await res.json(); // dùng res.json() để parse tự động
+  } catch (err) {
+      console.error('Lỗi kết nối hoặc JSON không hợp lệ', err);
+      alert('❌ Lỗi kết nối hoặc phản hồi không phải JSON.');
+      return;
+  }
+
+  // Xử lý kết quả
+  if (result.success) {
+      alert('✅ Trả phòng thành công.');
+      const form = document.getElementById('checkout-list');
+      if (form) form.style.display = 'none';
+
+      // Đổi trạng thái phòng
+      const roomsToUpdate = details
+          .map(d => phong.find(p => p.ID === d.Ma_phong))
+          .filter(r => r);
+
+      roomsToUpdate.forEach(room => {
+          room.Trang_thai = 'Đang dọn dẹp';
+          setTimeout(() => {
+              room.Trang_thai = 'Trống';
+              updateStatusBar(roomsToUpdate, loai_phong);
+          }, 12000);
+      });
+
+      //fetchAllDataRoom(); // load lại dữ liệu phòng
+      renderRoom();
+  } else {
+      alert('❌ Lỗi khi lưu trả phòng: ' + result.message);
+  }
+}
+
   function showCheckOutList(bookings) {
     const list = document.querySelector("#checkout-booking-list");
     const container = document.getElementById("checkout-list");
@@ -611,119 +1230,207 @@ document.addEventListener('DOMContentLoaded', () => {
       li.textContent = `Phiếu ${b.Ma_don_dat_phong} - ${b.Account}`;
       li.addEventListener("click", () => {
         container.style.display = 'none';
-        showCheckOutForm(b);
+        showCheckOutForm(b,bookings);
       });
       list.appendChild(li);
     });
   }
-  function showCheckOutForm(booking) {
+  async function showCheckOutForm(booking,bookings) {
     const form = document.getElementById("form-checkout");
     const roomSection = document.getElementById("checkout-room-section");
     const maDatSpan = document.getElementById("checkout-ma-dat");
     const totalDisplay = document.getElementById("total-display");
-  
+
+    // Cập nhật mã đơn đặt phòng
     maDatSpan.textContent = booking.Ma_don_dat_phong;
-    roomSection.innerHTML = '';
-    totalDisplay.textContent = 'Tổng tiền: 0 VNĐ';
-  
+    roomSection.innerHTML = ''; // Xóa nội dung cũ
+    totalDisplay.textContent = 'Tổng tiền: 0 VNĐ'; // Đặt lại tổng tiền
+
+    // Lấy danh sách phòng từ chi tiết hóa đơn
     const rooms = chi_tiet_hoa_don
-      .filter(c => hoa_don.find(h => h.Ma_Hoa_Don === c.Ma_Hoa_Don && h.Ma_don_dat_phong === booking.Ma_don_dat_phong))
-      .map(c => phong.find(p => p.ID === c.Ma_phong));
-  
-    let total = 0;
-  
+        .filter(c => hoa_don.find(h => h.Ma_Hoa_Don === c.Ma_Hoa_Don && h.Ma_don_dat_phong === booking.Ma_don_dat_phong))
+        .map(c => phong.find(p => p.ID === c.Ma_phong));
+
+    let total = 0; // Khởi tạo tổng tiền
+
+    // Duyệt qua từng phòng để hiển thị thông tin
     rooms.forEach(room => {
-      const roomType = loai_phong.find(l => l.Ma_Loai_Phong === room.Ma_Loai_Phong);
-      const roomDiv = document.createElement("div");
-      roomDiv.className = "room-checkout";
-  
-      const roomInfo = document.createElement("p");
-      roomInfo.textContent = `Phòng ${room.ID} - Giá: ${roomType.Gia} VNĐ`;
-      total += parseFloat(roomType.Gia);
-  
-      // ✅ Thay vì lấy từ chi_tiet_phong_hoa_don, lấy toàn bộ đồ dùng từ bảng do_dung
-      const itemListDiv = document.createElement("div");
-      do_dung.forEach(item => {
-        const label = document.createElement("label");
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = false;
-        checkbox.dataset.gia = item.Gia;
-        checkbox.dataset.id = item.Ma_Do_Dung;
-        checkbox.dataset.roomId = room.ID;
-  
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(` ${item.Ten} (${item.Gia} VNĐ)`));
-        itemListDiv.appendChild(label);
-        itemListDiv.appendChild(document.createElement("br"));
-      });
-  
-      roomDiv.appendChild(roomInfo);
-      roomDiv.appendChild(itemListDiv);
-      roomSection.appendChild(roomDiv);
+        const roomType = loai_phong.find(l => l.Ma_Loai_Phong === room.Ma_Loai_Phong);
+        const roomDiv = document.createElement("div");
+        roomDiv.className = "room-checkout";
+
+        const roomInfo = document.createElement("p");
+        roomInfo.textContent = `Phòng ${room.ID} - Giá: ${roomType.Gia.toLocaleString()} VNĐ`;
+        total += parseFloat(roomType.Gia); // Cộng dồn giá phòng
+
+        // Tạo danh sách đồ dùng
+        const itemListDiv = document.createElement("div");
+        do_dung.forEach(item => {
+            const label = document.createElement("label");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = false;
+            checkbox.dataset.gia = item.Gia;
+            checkbox.dataset.id = item.Ma_Do_Dung;
+            checkbox.dataset.roomId = room.ID;
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(` ${item.Ten} (${item.Gia.toLocaleString()} VNĐ)`));
+            itemListDiv.appendChild(label);
+            itemListDiv.appendChild(document.createElement("br"));
+        });
+
+        roomDiv.appendChild(roomInfo);
+        roomDiv.appendChild(itemListDiv);
+        roomSection.appendChild(roomDiv);
     });
-  
+
     // Cập nhật tổng tiền khi chọn/bỏ checkbox
     form.querySelectorAll("input[type='checkbox']").forEach(cb => {
-      cb.addEventListener("change", () => {
-        let newTotal = 0;
-        rooms.forEach(room => {
-          const roomType = loai_phong.find(l => l.Ma_Loai_Phong === room.Ma_Loai_Phong);
-          newTotal += parseFloat(roomType.Gia);
+        cb.addEventListener("change", () => {
+            let newTotal = total; // Bắt đầu từ tổng tiền phòng
+            form.querySelectorAll("input[type='checkbox']:checked").forEach(cb => {
+                newTotal += parseFloat(cb.dataset.gia); // Cộng thêm giá đồ dùng
+            });
+
+            totalDisplay.textContent = `Tổng tiền: ${newTotal.toLocaleString()} VNĐ`; // Cập nhật tổng tiền
         });
-  
-        form.querySelectorAll("input[type='checkbox']:checked").forEach(cb => {
-          newTotal += parseFloat(cb.dataset.gia);
-        });
-  
-        totalDisplay.textContent = `Tổng tiền: ${newTotal.toLocaleString()} VNĐ`;
-      });
     });
-  
-    totalDisplay.textContent = `Tổng tiền: ${total.toLocaleString()} VNĐ`;
-    form.style.display = 'block';
-    showFormWithDelay('form-checkout');
-  
+
+    totalDisplay.textContent = `Tổng tiền: ${total.toLocaleString()} VNĐ`; // Hiển thị tổng tiền ban đầu
+    form.style.display = 'block'; // Hiển thị form
+    showFormWithDelay('form-checkout'); // Gọi hàm hiển thị form với độ trễ
+
+    // Xử lý sự kiện xác nhận trả phòng
     document.getElementById("confirm-checkout").onclick = async () => {
-      const selectedItems = Array.from(
-        form.querySelectorAll("input[type='checkbox']:checked")
-      ).map(cb => ({
-        Ma_Do_Dung: cb.dataset.id,
-        Ma_phong:    cb.dataset.roomId
-      }));
-    
-      const giaTong = parseFloat(
-        totalDisplay.textContent.replace(/[^\d]/g, '')
-      );
-    
-      try {
-        const res = await fetch('./ConnectWithDatabase/insert_checkout.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            Ma_don_dat_phong: booking.Ma_don_dat_phong,
-            items: selectedItems,
-            Tong_tien: giaTong
-          })
+        const selectedItems = Array.from(
+            form.querySelectorAll("input[type='checkbox']:checked")
+        ).map(cb => ({
+            Ma_Do_Dung: cb.dataset.id,
+            Ma_phong: cb.dataset.roomId
+        }));
+
+        const giaTong = parseFloat(
+            totalDisplay.textContent.replace(/[^\d]/g, '')
+        );
+        const hoaDon = hoa_don.find(hd => hd.Ma_don_dat_phong === booking.Ma_don_dat_phong);
+        if (!hoaDon) {
+          alert("❌ Không tìm thấy hóa đơn cho đơn đặt phòng này!");
+          return;
+        }
+        const phongHoaDon = chi_tiet_hoa_don.filter(ct => ct.Ma_Hoa_Don === hoaDon.Ma_Hoa_Don);
+        console.log("Dữ liệu gửi đi:", {
+          Ma_don_dat_phong: booking.Ma_don_dat_phong,
+          items: selectedItems,
+          Tong_tien: giaTong,
+          idhd: hoaDon.Ma_Hoa_Don,
+          phong: phongHoaDon 
         });
-        const result = await res.json();            // trực tiếp .json()
-        if (result.success) {
-          alert("✅ Trả phòng thành công.");
-          form.style.display = 'none';
-    
-          // chỉ fetch lại từ DB, không tự setTimeout trạng thái local
-          fetchAllDataRoom();
+        try {
+            const res = await fetch('./ConnectWithDatabase/insert_checkout.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Ma_don_dat_phong: booking.Ma_don_dat_phong,
+                    items: selectedItems,
+                    Tong_tien: giaTong,
+                    idhd: hoaDon.Ma_Hoa_Don,
+                    phong: phongHoaDon.map(p => p.Ma_phong)
+                })
+            });
+            const result = await res.json(); // Phân tích JSON từ phản hồi
+
+            if (result.success) {
+                alert("✅ Trả phòng thành công.");
+                form.style.display = 'none'; // Ẩn form
+                // Fetch lại dữ liệu phòng từ DB
+                //await fetchAllDataRoom();
+                renderRoom();
+                updateCheckOutButton()
+                checkForCheckOut();
+                updateStatusBar(phong, loai_phong);
+                const index = bookings.findIndex(b => b.Ma_don_dat_phong === booking.Ma_don_dat_phong);
+                if (index !== -1) bookings.splice(index, 1); // Xóa đơn vừa xử lý
+
+                // ➕ Nếu vẫn còn đơn, hiển thị lại danh sách
+                if (bookings.length > 0) {
+                  document.getElementById("checkout-list").style.display = "block";
+                  showCheckOutList(bookings);
+                }
+                setTimeout(() => {
+                  fetch('./ConnectWithDatabase/update_room_status.php', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                          phong: phongHoaDon.map(p => p.Ma_phong)
+                      })
+                  })
+                  .then(res => res.json())
+                  .then(async data => {
+                      if (data.success) {
+                          console.log("✔️ Đã cập nhật phòng về trạng thái 'Trống'");
+                          //await fetchAllDataRoom(); // Refresh lại danh sách phòng
+                          renderRoom();
+                          updateCheckOutButton();
+                          checkForCheckOut();
+                        } else {
+                          console.error("❌ Không thể cập nhật trạng thái phòng:", data.message);
+                      }
+                  })
+                  .catch(err => {
+                      console.error("❌ Lỗi khi gửi yêu cầu cập nhật trạng thái phòng:", err);
+                  });
+              }, 5000); // 10 giây
+              
+            } else {
+                alert("❌ Lỗi khi lưu trả phòng: " + result.message);
+            }
+            
+        } catch (err) {
+            console.error("Lỗi fetch hoặc parse JSON:", err);
+            alert("❌ Lỗi xử lý phản hồi từ server.");
         }
-        else {
-          alert("❌ Lỗi khi lưu trả phòng: " + result.message);
-        }
-      } catch (err) {
-        console.error("Lỗi fetch hoặc parse JSON:", err);
-        alert("❌ Lỗi xử lý phản hồi từ server.");
-      }
     };
+}
+
+function formatDate(dateStrOrObj) {
+  const d = new Date(dateStrOrObj);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// ✅ Thêm biến toàn cục để lưu danh sách đơn sẵn sàng trả phòng
+let pendingCheckOuts = [];
+
+async function updateCheckOutButton() {
+  //await fetchAllDataRoom();
+  renderRoom();
+  const btn = document.getElementById("checkOutBtn");
+  const todayStr = formatDate(new Date());
+
+  let pendingCheckOuts = don_dat_phong.filter(d => {
+    if (d.Trang_thai !== "Đã nhận phòng") return false;
+    const ngayTraStr = formatDate(d.Ngay_tra);
+    return (
+      ngayTraStr === todayStr &&
+      hoa_don.some(h => h.Ma_don_dat_phong === d.Ma_don_dat_phong)
+    );
+  });
+
+  console.log("📌 Đơn cần trả hôm nay:", pendingCheckOuts.map(d => d.Ma_don_dat_phong));
+  if (btn) {
+    btn.disabled = pendingCheckOuts.length === 0;
+    if (!btn._listenerAdded && pendingCheckOuts.length > 0) {
+      btn.addEventListener('click', () => {
+        showCheckOutList(pendingCheckOuts);
+        document.getElementById('checkout-list').style.display = 'block';
+        showFormWithDelay('checkout-list');
+      });
+      btn._listenerAdded = true;
+    }
   }
-  
+}
+
+
   
   // Đặt cờ để biết form mới vừa mở
 let justOpenedForm = false;

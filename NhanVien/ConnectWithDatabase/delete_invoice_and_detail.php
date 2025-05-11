@@ -10,8 +10,8 @@ if (isset($data['Ma_don_dat_phong'])) {
     $ma_don_dat_phong = $data['Ma_don_dat_phong'];
 
     // Sau đó xóa hóa đơn
-    $stmt2 = $conn->prepare("DELETE FROM don_dat_phong WHERE Ma_don_dat_phong = ?");
-    $stmt2->bind_param("s", $ma_don_dat_phong);
+    $stmt = $conn->prepare("UPDATE don_dat_phong SET Trang_thai = 'Đã huỷ' WHERE Ma_don_dat_phong = ?");
+    $stmt->bind_param("s", $ma_don_dat_phongs);
 
     if ($stmt2->execute()) {
         echo json_encode(["success" => true, "message" => "Xóa thành công"]);

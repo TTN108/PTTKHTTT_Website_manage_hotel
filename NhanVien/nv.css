@@ -262,6 +262,8 @@
 
         .cancel {
             background-color: #999;
+            margin-left: 50%;
+            transform: translate(-50%,40%);
         }
 
         .cancel:hover {
@@ -441,3 +443,67 @@
             background-color: #2980b9;
             transform: scale(1.05);
         }
+        /* Media Query for max-width 670px */
+@media (max-width: 670px) {
+    .sidebar {
+      width: 180px;
+    }
+  
+    .header {
+      margin-left: 180px;
+    }
+  
+    .hotel-layout {
+      margin-left: 180px;
+    }
+  
+    .room-container,
+    .room-row {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .room {
+      width: 80%;
+      margin-bottom: 10px;
+    }
+  
+    .form-container-in,
+    .form-container-out {
+      width: 90%;
+      left: 5%;
+    }
+  }
+  
+  /* Media Query for max-width 370px */
+  @media (max-width: 370px) {
+    .sidebar {
+      width: 100px;
+    }
+  
+    .header {
+      margin-left: 100px;
+    }
+  
+    .hotel-layout {
+      margin-left: 100px;
+    }
+  
+    .room-container,
+    .room-row {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .room {
+      width: 90%;
+      margin-bottom: 8px;
+    }
+  
+    .form-container-in,
+    .form-container-out {
+      width: 95%;
+      left: 2.5%;
+    }
+  }
+  

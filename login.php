@@ -25,4 +25,16 @@
                 </div>
             </form>";
     }
+    if($_GET["op"] == "employee"){
+        echo "<form class='login-container' action='NhanVien/handle/login.php'>
+                <div class='background-image'>
+                <div class='login-form'>
+                    <h2>Login</h2>
+                    <input type='text' id='username' name='username' placeholder='Username'>
+                    <input type='password' id='password' name='password' placeholder='Password'>
+                    <button type='submit'>Submit</button>
+                </div>
+                </div>
+            </form>";
+    }
 ?>

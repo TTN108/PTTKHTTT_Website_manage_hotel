@@ -270,7 +270,7 @@ $import->close();
                 }
             },
         });
-        doc.text(430, y = y + 300, "Total: " + td[4].innerHTML);
+        doc.text(430, y = y + 100 + 20*a.length - 1, "Total: " + td[4].innerHTML);
         // save the data to this file
         doc.save('import');
     }

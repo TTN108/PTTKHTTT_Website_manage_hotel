@@ -94,6 +94,8 @@ function renderOrderTable() {
           ? `<a href="#" class="delete-btn" data-invoice-id="${booking.Ma_don_dat_phong}">Xóa</a>` : ''}
         ${(trangThai === 'Đã trả phòng' || trangThai === 'Đã nhận phòng') 
           ? `<a href="#" class="detail-btn" data-invoice-id="${booking.Ma_don_dat_phong}">Chi tiết</a>` : ''}
+        ${trangThai === 'Đã trả phòng' 
+          ? `<a href="#" class="print-btn" data-invoice-id="${booking.Ma_don_dat_phong}">In</a>` : ''}
       </td>
     `;
     tbody.appendChild(tr);
@@ -159,6 +161,12 @@ function renderOrderTable() {
       }
     });
   });
+  tbody.querySelectorAll('.print-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    generatePDF(btn.dataset.invoiceId);
+  });
+});
 }
 
 // Đoạn mã này sẽ được thực thi khi trang đã tải xong
@@ -279,3 +287,82 @@ function showOrderDetail(invoiceId) {
 
 
 document.addEventListener('DOMContentLoaded', fetchAllDataOrder);
+defaultStyle: {
+  font: 'Roboto'
+}
+function generatePDF(invoiceId) {
+  const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === invoiceId);
+  const invoice = hoa_don.find(h => h.Ma_don_dat_phong === invoiceId);
+  if (!booking || !invoice) {
+    alert("Không tìm thấy hóa đơn.");
+    return;
+  }
+
+  const customer = khach_hang.find(k => k.Account === booking.Account);
+  const invoiceDetail = chi_tiet_hoa_don.filter(ct => ct.Ma_Hoa_Don === invoice.Ma_Hoa_Don);
+  const roomType = loai_phong.find(lp => lp.Ma_Loai_Phong === booking.Ma_Loai_Phong);
+  const objectInRoom = chi_tiet_phong_hoa_don
+    .filter(ct => ct.Ma_Hoa_Don === invoice.Ma_Hoa_Don)
+    .map(ct => do_dung.find(o => o.Ma_Do_Dung === ct.Ma_do_dung))
+    .filter(Boolean);
+
+  const objectPrice = objectInRoom.reduce((sum, obj) => sum + Number(obj.Gia || 0), 0);
+  const totalPrice = roomType ? (Number(roomType.Gia) * invoiceDetail.length + objectPrice) : objectPrice;
+  const roomList = invoiceDetail.map(d => d.Ma_phong).join(', ');
+
+  const docDefinition = {
+    content: [
+      { text: 'HÓA ĐƠN THANH TOÁN', style: 'header', alignment: 'center' },
+      {
+        table: {
+          widths: ['auto', '*'],
+          body: [
+            ['Mã hóa đơn:', invoice.Ma_Hoa_Don],
+            ['Khách hàng:', customer?.Ten || 'Không rõ'],
+            ['Phòng:', roomList],
+            ['Ngày nhận:', booking.Ngay_nhan],
+            ['Ngày trả:', booking.Ngay_tra],
+            ['Loại phòng:', roomType?.Ten_loai || ''],
+            ['Giá phòng / đêm:', roomType ? `${roomType.Gia.toLocaleString('vi-VN')} VND` : '']
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 10, 0, 10]
+      },
+      { text: 'Đồ dùng sử dụng:', style: 'subheader' },
+      objectInRoom.length > 0 ? {
+        ul: objectInRoom.map(obj => `${obj.Ten} (${Number(obj.Gia).toLocaleString('vi-VN')} VND)`)
+      } : { text: 'Không sử dụng đồ dùng nào.' },
+      {
+        text: `Tổng tiền: ${totalPrice.toLocaleString('vi-VN')} VND`,
+        style: 'total',
+        margin: [0, 15, 0, 5]
+      },
+      {
+        text: `Trạng thái: ${booking.Trang_thai}`,
+        italics: true
+      }
+    ],
+    styles: {
+      header: {
+        fontSize: 18,
+        bold: true,
+        margin: [0, 0, 0, 10]
+      },
+      subheader: {
+        fontSize: 14,
+        bold: true,
+        margin: [0, 10, 0, 4]
+      },
+      total: {
+        fontSize: 13,
+        bold: true
+      }
+    },
+    defaultStyle: {
+      font: 'Roboto'
+    }
+  };
+
+  pdfMake.createPdf(docDefinition).download(`HoaDon_${invoice.Ma_Hoa_Don}.pdf`);
+}

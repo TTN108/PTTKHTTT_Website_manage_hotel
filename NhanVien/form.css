@@ -3,7 +3,25 @@
 #form-checkin,
 #form-new-booking,
 #checkout-list,
-#form-checkout {
+#form-checkout,
+#form-new-booking-step1,
+#form-new-booking-step2 {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px 25px;
+  margin: 30px auto;
+  width: 90%;
+  max-width: 250px;
+  max-height: 450px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 100;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow-y: auto;
+} /*{
   background: #fff;
   border-radius: 8px;
   padding: 20px 25px;
@@ -19,7 +37,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   overflow-y: scroll;
-}
+} */
 /* Tiêu đề form */
 h3, h4 {
   margin-top: 0;
@@ -112,7 +130,7 @@ button:hover {
 #available-rooms-manual button.selected {
   background-color: #007bff;
   color: white;
-  font-weight: bold;
+  font-weight:100;
   border-color: #0056b3;
 }
 
@@ -189,4 +207,30 @@ button:hover {
     font-size: 12px;
     padding: 6px;
   }
+}
+/* Khoảng cách giữa nút Tiếp theo và nội dung */
+#form-new-booking-step1 button,
+#form-new-booking-step2 button {
+  margin-top: 15px;
+}
+
+/* Căn giữa nút */
+#form-new-booking-step2 button {
+  margin-right: 10px;
+}
+#form-new-booking-step1,
+#form-new-booking-step2 {
+  border-left: 5px solid #007bff;
+}
+#booking-list-modal,
+#form-checkin,
+#form-new-booking,
+#form-new-booking-step1,
+#form-new-booking-step2,
+#checkout-list,
+#form-checkout {
+  width: 90%;
+  max-width: 370px;
+  margin: 15px auto;
+  padding: 15px 20px;
 }

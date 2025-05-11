@@ -10,6 +10,8 @@
   <title>Sơ đồ khách sạn</title>
   <link rel="stylesheet" href="./nv.css">
   <link rel="stylesheet" href="./form.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 </head>
 
 <body>
@@ -168,7 +170,7 @@
   <button id="confirm-assign-room">Xác nhận</button>
 </div>
 <!-- Form nhập dữ liệu đơn đặt phòng mới -->
-<div id="form-new-booking" style="display:none;">
+<!-- <div id="form-new-booking" style="display:none;">
 <h3>Thêm đơn đặt phòng mới</h3>
   <form id="manual-booking-data">
 
@@ -178,7 +180,7 @@
     <label>Username</label>
     <input type="text" name="username" required><br>
 
-    <!-- Thông tin khách hàng mới -->
+    Thông tin khách hàng mới
     <div id="new-customer-fields" style="display:none;">
       <label>Họ tên khách:</label>
       <input type="text" name="Ten_khach"><br>
@@ -196,7 +198,7 @@
       <input type="text" name="address"><br>
     </div>
 
-    <!-- Các trường khác -->
+    Các trường khác
     <label>Số lượng phòng:</label>
     <input type="number" name="So_luong_phong" id="So_luong_phong" min="1" required><br>
 
@@ -215,6 +217,56 @@
     <div id="available-rooms-manual"></div>
   </div>
 
+  <button id="confirm-manual-booking">Xác nhận</button>
+</div> -->
+<div id="form-new-booking-step1" style="display:none;">
+  <h3>Thêm đơn đặt phòng mới</h3>
+  <form id="manual-booking-data">
+    <label>CCCD:</label>
+    <input type="text" name="CCCD" required><br>
+
+    <label>Username:</label>
+    <input type="text" name="username" required><br>
+
+    <!-- Thông tin khách mới -->
+    <div id="new-customer-fields" style="display:none;">
+      <label>Họ tên khách:</label>
+      <input type="text" name="Ten_khach"><br>
+
+      <label>Password:</label>
+      <input type="text" name="password"><br>
+
+      <label>Email:</label>
+      <input type="text" name="email"><br>
+
+      <label>Số điện thoại:</label>
+      <input type="text" name="phone"><br>
+
+      <label>Địa chỉ:</label>
+      <input type="text" name="address"><br>
+    </div>
+
+    <label>Số lượng phòng:</label>
+    <input type="number" name="So_luong_phong" min="1" required><br>
+
+    <label>Số lượng người:</label>
+    <input type="number" name="So_luong_nguoi" min="1" required><br>
+
+    <label>Ngày trả:</label>
+    <input type="date" name="Ngay_tra" required><br>
+
+    <label>Loại phòng:</label>
+    <select name="Ma_loai_phong" id="select-room-type" required></select><br>
+
+    <button type="button" id="to-step2">Tiếp theo</button>
+  </form>
+</div>
+
+<!-- Bước 2: Chọn phòng và xác nhận -->
+<div id="form-new-booking-step2" style="display:none;">
+  <h3>Chọn phòng phù hợp</h3>
+  <div id="available-rooms-manual"></div>
+  <button type="button" id="back-to-step1">Quay lại</button>
   <button id="confirm-manual-booking">Xác nhận</button>
 </div>
 
@@ -235,6 +287,7 @@
   <script>
     const currentUsername = "<?php echo $_SESSION['user']; ?>";
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="./ConnectWithDatabase/RenderRoom.js"></script>
   <script src="./ConnectWithDatabase/RenderOrderTable.js"></script>

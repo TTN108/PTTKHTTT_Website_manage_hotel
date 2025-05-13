@@ -1,5 +1,8 @@
 <?php
   session_start();
+  if(@!$_SESSION["user"]){
+    header("Location: ../login.php?op=employee");
+  }
 ?>
 
 <!DOCTYPE html>
@@ -10,24 +13,16 @@
   <title>Sơ đồ khách sạn</title>
   <link rel="stylesheet" href="./nv.css">
   <link rel="stylesheet" href="./form.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 </head>
 
 <body>
-  <form class="login-container" onsubmit="return check_login()" method="get" action="handle/login.php">
-    <div class="background-image">
-      <div class="login-form">
-        <h2>Login</h2>
-        <input type="text" id="username" name="username" placeholder="Username">
-        <input type="password" id="password" name="password" placeholder="Password">
-        <button type="submit">Submit</button>
-      </div>
-    </div>
-  </form>
   <!-- Sidebar -->
   <div class="sidebar">
     <a href="#" id="hotelLink" onclick="renderHotelLayout()">Sơ đồ khách sạn</a>
     <a href="#" id="orderLink" onclick="renderOrderTable()">Đơn hàng</a>
-    <a href="#" id="chartLink" onclick="filterChart();">Thống kê</a>
+    <a href="#" id="chartLink" onclick="filterChart()">Thống kê</a>
   </div>
   <!-- Header -->
   <div class="header-bar">
@@ -83,6 +78,7 @@
             <option value="Đã xác nhận">Đã xác nhận</option>
             <option value="Đã nhận phòng">Đã nhận phòng</option>
             <option value="Đã trả phòng">Đã trả phòng</option>
+            <option value="Đã huỷ">Đã huỷ</options>
           </select>
     </div>
 
@@ -101,60 +97,7 @@
       </tbody>
     </table>
   </div>
-
-  <!-- Form Nhận phòng -->
-  <div class="form-container-in" id="checkin-form" method="POST" action="">
-      <h2>Thông tin khách hàng</h2>
-      <label>Name*</label>
-      <input type="text" id="customer-name" name="customer-name" placeholder="Nhập tên khách hàng">
-      
-      <label>ID card*</label>
-      <input type="text" id="customer-idcard" name="customer-idcard" placeholder="Nhập số CMND/CCCD">
-      
-      <label>Email*</label>
-      <input type="email" id="customer-email" name="customer-email" placeholder="Nhập email">
-      
-      <label>Phone*</label>
-      <input type="text" id="customer-phone" name="customer-phone" placeholder="Nhập số điện thoại">
-      
-      <label>Địa chỉ*</label>
-      <input type="text" id="customer-address" name="customer-address" placeholder="Nhập địa chỉ">
-  
-      <div class="button-group">
-        <button class="cancel">Hủy</button>
-        <button class="confirm" id="checkin-confirm">Nhận phòng</button>
-      </div>
-    </div>
-    
-    <!-- Form Trả phòng -->
-    <div class="form-container-out" id="checkout-form">
-        <h2>Hóa đơn phòng 401</h2>
-        <p>Khách hàng: Trần Trọng Nghĩa</p>
-        <p>Mã HD: HD001</p>
-        <p>Vào lúc: 8:57 27/2/2025</p>
-        <p>Trả lúc: 9:02 28/2/2025</p>
-        <p>Loại phòng: Phòng standard</p>
-        <p>Giá: 500,000</p>
-        <hr>
-        <p>Tiền phòng: 500,000</p>
-        <p>1 ngày (8:57 27/2/2025 - 9:02 28/2/2025)</p>
-        <p>Thanh toán: 500,000</p>
-        <label>Trạng thái:</label>
-        <select id="object-room" name="object-room">
-            <option></option>
-            <option></option>
-        </select>
-        <button class="confirm">Trả phòng</button>
-    </div>
-    <div class="form-empty-room" id="form-empty-room">
-        <p>Danh sách phòng trống</p>
-        <div class="empty">
-          <div class="form-room">
-            
-          </div>
-        </div>
-    </div>
-    <!-- Danh sách các phiếu đặt phòng chưa nhận phòng -->
+<!-- Danh sách các phiếu đặt phòng chưa nhận phòng -->
 <div id="booking-list-modal" style="display:none;">
   <h3>Chọn Phiếu Đặt Phòng</h3>
   <ul id="booking-list"></ul>
@@ -164,56 +107,50 @@
 <div id="form-checkin" style="display:none;">
   <h3>Chọn Phòng Cho Phiếu: <span id="current-booking-id"></span></h3>
   <div id="available-rooms"></div>
+  <button type="button" id="back-to-booking-list">Quay lại</button>
   <button id="confirm-assign-room">Xác nhận</button>
 </div>
 <!-- Form nhập dữ liệu đơn đặt phòng mới -->
-<div id="form-new-booking" style="display:none;">
-<h3>Thêm đơn đặt phòng mới</h3>
+<!-- Bước 1: Nhập thông tin khách hàng -->
+<div id="form-new-booking-step1" style="display:none;">
+  <h3>Thêm đơn đặt phòng mới</h3>
   <form id="manual-booking-data">
-
     <label>CCCD:</label>
     <input type="text" name="CCCD" required><br>
-
-    <label>Username</label>
+    <label>Username:</label>
     <input type="text" name="username" required><br>
 
-    <!-- Thông tin khách hàng mới -->
     <div id="new-customer-fields" style="display:none;">
       <label>Họ tên khách:</label>
       <input type="text" name="Ten_khach"><br>
-      
-      <label>Password</label>
+      <label>Password:</label>
       <input type="text" name="password"><br>
-      
-      <label>Email</label>
+      <label>Email:</label>
       <input type="text" name="email"><br>
-      
       <label>Số điện thoại:</label>
       <input type="text" name="phone"><br>
-      
-      <label>Địa chỉ</label>
+      <label>Địa chỉ:</label>
       <input type="text" name="address"><br>
     </div>
 
-    <!-- Các trường khác -->
     <label>Số lượng phòng:</label>
-    <input type="number" name="So_luong_phong" id="So_luong_phong" min="1" required><br>
-
+    <input type="number" name="So_luong_phong" min="1" required><br>
     <label>Số lượng người:</label>
     <input type="number" name="So_luong_nguoi" min="1" required><br>
-
     <label>Ngày trả:</label>
     <input type="date" name="Ngay_tra" required><br>
-
     <label>Loại phòng:</label>
     <select name="Ma_loai_phong" id="select-room-type" required></select><br>
+
+    <button type="button" id="to-step2">Tiếp theo</button>
   </form>
+</div>
 
-  <div id="manual-room-select">
-    <h4>Chọn phòng phù hợp</h4>
-    <div id="available-rooms-manual"></div>
-  </div>
-
+<!-- Bước 2: Chọn phòng và xác nhận -->
+<div id="form-new-booking-step2" style="display:none;">
+  <h3>Chọn phòng phù hợp</h3>
+  <div id="available-rooms-manual"></div>
+  <button type="button" id="back-to-step1">Quay lại</button>
   <button id="confirm-manual-booking">Xác nhận</button>
 </div>
 
@@ -231,43 +168,15 @@
   <button id="confirm-checkout">Xác nhận trả phòng</button>
 </div>
 
-
+  <script>
+    const currentUsername = "<?php echo $_SESSION['user']; ?>";
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="./ConnectWithDatabase/RenderRoom.js"></script>
   <script src="./ConnectWithDatabase/RenderOrderTable.js"></script>
   <script src="./Interface.js"></script>
   <script src="Script.js"></script>
-  <?php
-  if (@$_SESSION['user']) {
-    echo "<script>
-    document.getElementsByClassName('login-container')[0].style.display = 'none';
-    document.getElementsByClassName('header-bar')[0].style.display = 'block';
-    document.getElementsByClassName('sidebar')[0].style.display = 'block';
-    document.getElementsByClassName('hotel-layout')[0].style.display = 'block';
-    document.getElementById('hotelLayout').style.display = 'block';
-    </script>";
-  } else {
-    echo "<script>
-    document.getElementsByClassName('login-container')[0].style.display = 'flex';
-    document.getElementsByClassName('header-bar')[0].style.display = 'none';
-    document.getElementsByClassName('sidebar')[0].style.display = 'none';
-    document.getElementsByClassName('hotel-layout')[0].style.display = 'none';
-    document.getElementById('hotelLayout').style.display = 'none';
-    </script>";
-  }
-  $con = mysqli_connect("localhost", "root", "", "hotel");
-  $acc = array();
-  $pass = array();
-  $job = array();
-  $sql = "SELECT account.Username, account.Password, nhan_vien.Chuc_vu FROM account, nhan_vien WHERE account.Username = nhan_vien.Account";
-  $res = mysqli_query($con, $sql);
-  while ($row = mysqli_fetch_array($res)) {
-    $acc[] = $row[0];
-    $pass[] = $row[1];
-    $job[] = $row[2];
-  }
-  mysqli_close($con);
-  ?>
   <script>
     let chartInstance = null;
 
@@ -406,13 +315,12 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }, 100);
 });
-
     function check_login() {
       var username = document.getElementById("username");
       var password = document.getElementById("password");
-      var users = <?php echo json_encode($acc) ?>;
-      var passes = <?php echo json_encode($pass) ?>;
-      var job = <?php echo json_encode($job) ?>;
+      var users = <?php echo isset($acc) ? json_encode($acc) : null; ?>;
+      var passes = <?php echo isset($pass) ? json_encode($pass) : null; ?>;
+      var job = <?php echo isset($job) ? json_encode($job) : null; ?>;
       if (!username.value || !password.value) {
         alert("Vui lòng nhập đầy đủ!");
         return false;
@@ -425,8 +333,7 @@ window.addEventListener('DOMContentLoaded', () => {
       alert("Đang sai tài khoản hoặc mật khẩu hoặc bạn không phải là chủ doanh nghiệp hoặc nhân viên");
       return false;
     }
-
-    //const chart = new Chart(document.getElementById('myChart'), config);
+    // const chart = new Chart(document.getElementById('myChart'), config);
   </script>
 </body>
 

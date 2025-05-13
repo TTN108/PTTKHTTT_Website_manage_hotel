@@ -37,11 +37,7 @@ const barchart = document.getElementById("chart");
    barchart.style.display = 'none';
    initOrderTab();
  });
- 
- function closeForms() {
-   document.querySelector('.form-container-in').classList.remove('active');
-   document.querySelector('.form-container-out').classList.remove('active');
- }
+
  
  // Sự kiện cho nút "Hủy" trong các form
  document.querySelectorAll('.cancel').forEach(button => {
@@ -50,19 +46,7 @@ const barchart = document.getElementById("chart");
      e.stopPropagation();
    });
  });
- 
- // Khi click bên ngoài form thì đóng form
- document.addEventListener('click', function(e) {
-   const checkinForm = document.querySelector('.form-container-in');
-   const checkoutForm = document.querySelector('.form-container-out');
-   if (!checkinForm.contains(e.target) && !checkoutForm.contains(e.target)) {
-     closeForms();
-   }
- });
- 
- // Ngăn click bên trong form nổi lên
- document.querySelectorAll('.form-container-in, .form-container-out').forEach(form => {
-   form.addEventListener('click', function(e) {
-     e.stopPropagation();
-   });
- });
+    document.getElementById("back-to-booking-list").addEventListener("click", function () {
+      document.getElementById("form-checkin").style.display = "none";
+      document.getElementById("booking-list-modal").style.display = "block";
+    });

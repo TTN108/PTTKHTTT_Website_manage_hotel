@@ -116,6 +116,16 @@ class Database {
         }
         return $accounts;
     }
+    function getStaffs() {
+        $sql = "SELECT * FROM nhan_vien";
+        $result = $this->conn->query($sql);
+        $staffs = [];
+    
+        while ($row = $result->fetch_assoc()) {
+            $staffs[] = $row;
+        }
+        return $staffs;
+    }
     // public function __destruct() {
     //     if ($this->conn && @$this->conn instanceof mysqli) {
     //         // Nếu còn mở, thì đóng lại an toàn

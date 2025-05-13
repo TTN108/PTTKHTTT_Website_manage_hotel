@@ -1452,6 +1452,8 @@ function showFormWithDelay(id) {
       document.getElementById('booking-list-modal'),
       document.getElementById('form-checkin'),
       document.getElementById('form-new-booking'),
+      document.getElementById('form-new-booking-step1'),
+      document.getElementById('form-new-booking-step2'),
       document.getElementById('checkout-list'),
       document.getElementById('form-checkout'),
     ];

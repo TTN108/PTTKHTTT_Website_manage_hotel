@@ -170,55 +170,6 @@
   <button id="confirm-assign-room">Xác nhận</button>
 </div>
 <!-- Form nhập dữ liệu đơn đặt phòng mới -->
-<!-- <div id="form-new-booking" style="display:none;">
-<h3>Thêm đơn đặt phòng mới</h3>
-  <form id="manual-booking-data">
-
-    <label>CCCD:</label>
-    <input type="text" name="CCCD" required><br>
-
-    <label>Username</label>
-    <input type="text" name="username" required><br>
-
-    Thông tin khách hàng mới
-    <div id="new-customer-fields" style="display:none;">
-      <label>Họ tên khách:</label>
-      <input type="text" name="Ten_khach"><br>
-      
-      <label>Password</label>
-      <input type="text" name="password"><br>
-      
-      <label>Email</label>
-      <input type="text" name="email"><br>
-      
-      <label>Số điện thoại:</label>
-      <input type="text" name="phone"><br>
-      
-      <label>Địa chỉ</label>
-      <input type="text" name="address"><br>
-    </div>
-
-    Các trường khác
-    <label>Số lượng phòng:</label>
-    <input type="number" name="So_luong_phong" id="So_luong_phong" min="1" required><br>
-
-    <label>Số lượng người:</label>
-    <input type="number" name="So_luong_nguoi" min="1" required><br>
-
-    <label>Ngày trả:</label>
-    <input type="date" name="Ngay_tra" required><br>
-
-    <label>Loại phòng:</label>
-    <select name="Ma_loai_phong" id="select-room-type" required></select><br>
-  </form>
-
-  <div id="manual-room-select">
-    <h4>Chọn phòng phù hợp</h4>
-    <div id="available-rooms-manual"></div>
-  </div>
-
-  <button id="confirm-manual-booking">Xác nhận</button>
-</div> -->
 <div id="form-new-booking-step1" style="display:none;">
   <h3>Thêm đơn đặt phòng mới</h3>
   <form id="manual-booking-data">

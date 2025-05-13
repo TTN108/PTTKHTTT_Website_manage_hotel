@@ -348,6 +348,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            height: 80%;
             margin-bottom: 20px;
         }
         .form-empty-room {

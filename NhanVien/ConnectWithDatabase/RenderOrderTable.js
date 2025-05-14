@@ -173,37 +173,38 @@ function renderOrderTable() {
 function filterOrders() {
   const startDate = document.getElementById('start-date').value;
   const endDate = document.getElementById('end-date').value;
+  const statusFilter = document.getElementById('filter-status').value;
   const tableRows = document.querySelectorAll('.order-table tbody tr');
 
+  function normalize(date) {
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  const start = startDate ? normalize(new Date(startDate)) : null;
+  const end = endDate ? normalize(new Date(endDate)) : null;
+
   tableRows.forEach(row => {
-    const invoiceId = row.cells[0].innerText.trim();
-    const invoice = hoa_don.find(h => h.Ma_Hoa_Don === invoiceId);
+    const bookingId = row.cells[0].innerText.trim(); // dùng bookingId vì đây là mã đơn
+    const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === bookingId);
+    if (!booking) return row.style.display = 'none';
 
-    if (!invoice) {
-      row.style.display = 'none';
-      return;
-    }
-
-    const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === invoice.Ma_don_dat_phong);
-    if (!booking) {
-      row.style.display = 'none';
-      return;
-    }
+    const invoice = hoa_don.find(h => h.Ma_don_dat_phong === booking.Ma_don_dat_phong);
 
     const dates = ['Ngay_dat', 'Ngay_nhan', 'Ngay_tra']
-      .map(field => new Date(booking[field]))
-      .filter(d => !isNaN(d.getTime())); // Loại bỏ giá trị không hợp lệ
+      .map(field => normalize(new Date(booking[field])))
+      .filter(d => !isNaN(d.getTime()));
 
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
+    const isInRange = dates.some(date =>
+      (!start || date >= start) && (!end || date <= end)
+    );
 
-    const isInRange = dates.some(date => {
-      return (!start || date >= start) && (!end || date <= end);
-    });
+    const matchStatus = !statusFilter || booking.Trang_thai === statusFilter;
 
-    row.style.display = isInRange ? '' : 'none';
+    row.style.display = (isInRange && matchStatus) ? '' : 'none';
   });
 }
+
 
 
 
@@ -212,9 +213,9 @@ function showOrderDetail(invoiceId) {
   const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === invoiceId);
   const invoice = hoa_don.find(h => h.Ma_don_dat_phong === invoiceId);
   if (!invoice) return;
-  console.log(invoice);
+  console.log("Hoá đơn: " + invoice);
   if (!booking) return;
-  console.log(booking);
+  console.log("Đơn đặt phòng: " + booking);
   const customer = khach_hang.find(k => k.Account === booking.Account);
   let Room = [];
   let count = 0;
@@ -224,7 +225,7 @@ function showOrderDetail(invoiceId) {
     Room.push(room.ID);
     count++;
   });
-  console.log(Room);
+  console.log("Phòng: " + Room);
   const roomType = booking ? loai_phong.find(lp => lp.Ma_Loai_Phong === booking.Ma_Loai_Phong) : null;
 
   // Màu header theo loại phòng
@@ -252,7 +253,7 @@ function showOrderDetail(invoiceId) {
     RoomName += Room[i] + '\t';
     i++;
   } while ((Room.length - 1) == i);
-  console.log(RoomName)
+  console.log("Tên phòng:" + RoomName)
   const form = document.getElementById('checkout-form');
   form.innerHTML = `
     <h2 style="background-color: ${headerBg};">
@@ -331,7 +332,22 @@ function generatePDF(invoiceId) {
       },
       { text: 'Đồ dùng sử dụng:', style: 'subheader' },
       objectInRoom.length > 0 ? {
-        ul: objectInRoom.map(obj => `${obj.Ten} (${Number(obj.Gia).toLocaleString('vi-VN')} VND)`)
+        table: {
+          headerRows: 1,
+          widths: ['auto', '*', 'auto', 'auto', 'auto'],
+          body: [
+            ['STT', 'Tên đồ dùng', 'Số lượng', 'Đơn giá', 'Thành tiền'],
+            ...objectInRoom.map((obj, index) => [
+              index + 1,
+              obj.Ten,
+              1,
+              `${Number(obj.Gia).toLocaleString('vi-VN')} VND`,
+              `${Number(obj.Gia).toLocaleString('vi-VN')} VND`
+            ])
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 10, 0, 10]
       } : { text: 'Không sử dụng đồ dùng nào.' },
       {
         text: `Tổng tiền: ${totalPrice.toLocaleString('vi-VN')} VND`,

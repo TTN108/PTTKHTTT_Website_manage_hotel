@@ -63,6 +63,7 @@
             margin-left: 220px;
             background-color: #f0f0f0;
             position: relative;
+            z-index: 999;
         }
 
         .status-item {
@@ -348,6 +349,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            height: 80%;
             margin-bottom: 20px;
         }
         .form-empty-room {
@@ -506,4 +508,3 @@
       left: 2.5%;
     }
   }
-  

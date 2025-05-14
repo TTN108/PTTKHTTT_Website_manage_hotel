@@ -1,0 +1,390 @@
+/* ------------------------------------- Header ----------------------------------------- */
+#header {
+    position: fixed;
+    width: 100%;
+    display: flex;
+    padding: 10px;
+    background-color: whitesmoke;
+    border-bottom: 1px solid lightgray;
+}
+
+/* ---------------------------------- Logo ----------------------------------------- */
+#logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 3%;
+    width: 200px;
+    max-height: 70px;
+    min-height: 70px;
+    overflow: hidden;
+}
+
+#logo {
+    cursor: pointer;
+    width: 100%;
+}
+
+/* -------------------------------- Head Menu ------------------------------------- */
+#head-menu-container {
+    width: 60%;
+    display: flex;
+    align-items: center;
+}
+
+#head-menu {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+}
+
+.head-menu-item {
+    width: 15%;
+    font-size: 24px;
+    line-height: 40px;
+    margin: 0px 10px 0px 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.head-menu-item.active {
+    background: linear-gradient(to top, rgba(211, 211, 211, 0.5), whitesmoke);
+}
+
+/* ------------------------------ Login Button ----------------------------------- */
+#login-button-container {
+    width: calc(40% - 200px);
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    align-items: center;
+}
+
+#login-button,
+#signin-button,
+#account-ctn {
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+    margin: 20px;
+    font-size: 20px;
+}
+
+#account-ctn
+{
+    position: relative;
+}
+
+#account-ctn:hover #account-menu
+{
+    display: flex;
+}
+
+#account-menu
+{
+    background: white;
+    right: 0px;
+    position: absolute;
+    border: 1px solid black;
+    padding: 3px;
+    border-radius: 5px;
+    display: none;
+    flex-direction: column;
+    width: max-content;
+}
+
+.account-menu-btn
+{
+    width: 100%;
+    height: 40px;
+    font-size: 16px;
+    border-bottom: 1px solid lightgray;
+    padding: 0px 10px 0px 10px;
+}
+
+.account-menu-btn:hover
+{
+    background: lightgray;
+}
+
+/* ------------------------------ Login/Signin Form ----------------------------------- */
+#login-form-container {
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#login-form-container.active {
+    z-index: 9999999;
+    display: flex;
+}
+
+.back-arrow-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    border-radius: 100%;
+    background-color: whitesmoke;
+}
+
+.back-arrow-container:hover {
+    cursor: pointer;
+    background-color: lightgray;
+}
+
+.back-arrow {
+    width: 40px;
+    text-align: center;
+    font-size: 30px;
+    line-height: 40px;
+}
+
+/* ------------------------------ Login Form ----------------------------------- */
+.login-form {
+    position: relative;
+    display: none;
+    border: 3px solid black;
+    border-radius: 20px;
+    padding: 40px;
+    width: 45vw;
+    height: 60vh;
+    background-color: whitesmoke;
+}
+
+#login-form {
+    z-index: 1;
+}
+
+.login-form.active {
+    display: block;
+}
+
+.login-form-mini-container {
+    width: 100%;
+    display: flex;
+    justify-content: left;
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.login-form-mini-container h1 {
+    margin: auto;
+}
+
+.login-form-mini-container label {
+    width: 25%;
+    font-size: 20px;
+    line-height: 30px;
+}
+
+.login-form-mini-container input {
+    width: 75%;
+    position: absolute;
+    right: 0;
+    line-height: 30px;
+    font-size: 18px;
+    border: none;
+    border-bottom: 1px solid black;
+    background-color: whitesmoke;
+}
+
+.login-form-mini-container.form-link {
+    justify-content: right;
+}
+
+.login-form-mini-container.form-login-button {
+    justify-content: center;
+}
+
+#login-form-login-button {
+    margin: -16px;
+    cursor: pointer;
+    height: 40px;
+    width: 100px;
+    border: 2px solid black;
+    font-size: 18px;
+}
+
+/* ------------------------------ Signin Form ----------------------------------- */
+#signin-form {
+    height: 95vh;
+    z-index: 100;
+}
+
+#signin-form>* {
+    margin-bottom: 20px;
+}
+
+.login-form-mini-container.form-signin-button {
+    justify-content: center;
+    margin-top: 25px;
+}
+
+#login-form-signin-button {
+    cursor: pointer;
+    height: 40px;
+    width: 100px;
+    border: 2px solid black;
+    font-size: 18px;
+}
+
+/* ------------------------------ Forgot Password Form ----------------------------------- */
+#login-form-password-button {
+    cursor: pointer;
+    height: 40px;
+    width: 100px;
+    border: 2px solid black;
+    font-size: 18px;
+    z-index: 100;
+}
+
+.login-form-mini-container.form-password-button {
+    justify-content: center;
+    margin-top: 75px;
+}
+/* --------------------------------- Account Infomation Form --------------------------------- */
+#account-info-ctn
+{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: white;
+    height: 100vh;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+}
+
+#account-info-ctn.active
+{
+    display: flex;
+}
+
+.account-info-mini-container
+{
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 10px;
+    font-size: 20px;
+}
+
+.account-info-mini-container label
+{
+    width: 30%;
+}
+
+.account-info-mini-container input
+{
+    width: 70%;
+    border: 2px solid gray;
+    height: 40px;
+    font-size: 20px;
+}
+
+#account-info-edit-button
+{
+    cursor: pointer;
+}
+
+#account-info-edit-button:hover
+{
+    background: lightgray;
+}
+
+#histories-ctn
+{
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    background-color: whitesmoke;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid black;
+}
+
+#histories-table-ctn
+{
+    max-height: 95vh;
+    overflow-y: auto;
+}
+
+#histories-table
+{
+    margin-top: 20px;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+#histories-table th,
+#histories-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.history-button
+{
+    padding: 10px;
+    width: 80%;
+    background: lightgray;
+    border: 1px solid black;
+}
+
+#invoice-details {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    position: fixed;
+    width: 500px;
+    height: 100vh;
+    max-height: 100vh;
+    top:0;
+    left: 50%;
+    padding: 10px;
+    transform: translate(-50%,0%);
+    border: 2px solid black;
+    background: whitesmoke;
+    overflow-y: scroll;
+}
+
+#invoice-x
+{
+    right: 0px;
+}
+
+#invoice
+{
+    padding: 10px;
+    width: 100%;
+}
+
+#printInvoiceBtn
+{
+    padding: 10px;
+    font-size: 18px;
+    background: black;
+    cursor: pointer;
+    outline: none;
+    border: 1px solid black;
+    color:white;
+    border-radius: 5px;
+}
+
+#printInvoiceBtn:hover
+{
+    background: none;
+    color: black;
+}

@@ -1,8 +1,8 @@
 <?php
-  session_start();
-  if(@!$_SESSION["user"]){
-    header("Location: ../login.php?op=employee");
-  }
+session_start();
+if (@!$_SESSION["user"]) {
+  header("Location: ../login.php?op=employee");
+}
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +22,7 @@
   <div class="sidebar">
     <a href="#" id="hotelLink" onclick="renderHotelLayout()">Sơ đồ khách sạn</a>
     <a href="#" id="orderLink" onclick="renderOrderTable()">Đơn hàng</a>
-    <a href="#" id="chartLink" onclick="filterChart()">Thống kê</a>
+    <a href="#" id="chartLink" onclick="filterChart();">Thống kê</a>
   </div>
   <!-- Header -->
   <div class="header-bar">
@@ -79,6 +79,7 @@
             <option value="Đã nhận phòng">Đã nhận phòng</option>
             <option value="Đã trả phòng">Đã trả phòng</option>
             <option value="Đã huỷ">Đã huỷ</options>
+            <option value="Quá hạn">Quá hạn</options>
           </select>
     </div>
 
@@ -97,13 +98,12 @@
       </tbody>
     </table>
   </div>
-<!-- Danh sách các phiếu đặt phòng chưa nhận phòng -->
+    <!-- Danh sách các phiếu đặt phòng chưa nhận phòng -->
 <div id="booking-list-modal" style="display:none;">
   <h3>Chọn Phiếu Đặt Phòng</h3>
   <ul id="booking-list"></ul>
 </div>
 
-<!-- Form chọn phòng phù hợp loại phòng -->
 <div id="form-checkin" style="display:none;">
   <h3>Chọn Phòng Cho Phiếu: <span id="current-booking-id"></span></h3>
   <div id="available-rooms"></div>
@@ -111,44 +111,80 @@
   <button id="confirm-assign-room">Xác nhận</button>
 </div>
 <!-- Form nhập dữ liệu đơn đặt phòng mới -->
-<!-- Bước 1: Nhập thông tin khách hàng -->
-<div id="form-new-booking-step1" style="display:none;">
+<div id="form-new-booking-step1">
   <h3>Thêm đơn đặt phòng mới</h3>
   <form id="manual-booking-data">
     <label>CCCD:</label>
     <input type="text" name="CCCD" required><br>
+
     <label>Username:</label>
     <input type="text" name="username" required><br>
 
+    <!-- Thông tin khách mới -->
     <div id="new-customer-fields" style="display:none;">
       <label>Họ tên khách:</label>
       <input type="text" name="Ten_khach"><br>
+
       <label>Password:</label>
       <input type="text" name="password"><br>
+
       <label>Email:</label>
       <input type="text" name="email"><br>
+
       <label>Số điện thoại:</label>
       <input type="text" name="phone"><br>
+
       <label>Địa chỉ:</label>
       <input type="text" name="address"><br>
     </div>
 
     <label>Số lượng phòng:</label>
     <input type="number" name="So_luong_phong" min="1" required><br>
+
     <label>Số lượng người:</label>
     <input type="number" name="So_luong_nguoi" min="1" required><br>
+
     <label>Ngày trả:</label>
     <input type="date" name="Ngay_tra" required><br>
+
     <label>Loại phòng:</label>
     <select name="Ma_loai_phong" id="select-room-type" required></select><br>
 
     <button type="button" id="to-step2">Tiếp theo</button>
   </form>
 </div>
-
+<!-- Form Trả phòng -->
+    <div class="form-container-out" id="checkout-form">
+        <h2>Hóa đơn phòng 401</h2>
+        <p>Khách hàng: Trần Trọng Nghĩa</p>
+        <p>Mã HD: HD001</p>
+        <p>Vào lúc: 8:57 27/2/2025</p>
+        <p>Trả lúc: 9:02 28/2/2025</p>
+        <p>Loại phòng: Phòng standard</p>
+        <p>Giá: 500,000</p>
+        <hr>
+        <p>Tiền phòng: 500,000</p>
+        <p>1 ngày (8:57 27/2/2025 - 9:02 28/2/2025)</p>
+        <p>Thanh toán: 500,000</p>
+        <label>Trạng thái:</label>
+        <select id="object-room" name="object-room">
+            <option></option>
+            <option></option>
+        </select>
+        <button class="confirm">Trả phòng</button>
+    </div>
+    <div class="form-empty-room" id="form-empty-room">
+        <p>Danh sách phòng trống</p>
+        <div class="empty">
+          <div class="form-room">
+            
+          </div>
+        </div>
+    </div>
 <!-- Bước 2: Chọn phòng và xác nhận -->
-<div id="form-new-booking-step2" style="display:none;">
-  <h3>Chọn phòng phù hợp</h3>
+<div id="form-new-booking-step2">
+  <h3>Chọn phòng phù hợp</h3>    
+   Số lượng phòng:<span id="room-quantity-display"></span>
   <div id="available-rooms-manual"></div>
   <button type="button" id="back-to-step1">Quay lại</button>
   <button id="confirm-manual-booking">Xác nhận</button>
@@ -315,25 +351,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }, 100);
 });
-    function check_login() {
-      var username = document.getElementById("username");
-      var password = document.getElementById("password");
-      var users = <?php echo isset($acc) ? json_encode($acc) : null; ?>;
-      var passes = <?php echo isset($pass) ? json_encode($pass) : null; ?>;
-      var job = <?php echo isset($job) ? json_encode($job) : null; ?>;
-      if (!username.value || !password.value) {
-        alert("Vui lòng nhập đầy đủ!");
-        return false;
-      }
-      for (var i = 0; i < users.length; i++) {
-        if (username.value == users[i] && password.value == passes[i] && (job[i] == "Chủ doanh nghiệp" || job[i] == "Nhân viên")) {
-          return true;
-        }
-      }
-      alert("Đang sai tài khoản hoặc mật khẩu hoặc bạn không phải là chủ doanh nghiệp hoặc nhân viên");
-      return false;
-    }
-    // const chart = new Chart(document.getElementById('myChart'), config);
+
+    //const chart = new Chart(document.getElementById('myChart'), config);
   </script>
 </body>
 

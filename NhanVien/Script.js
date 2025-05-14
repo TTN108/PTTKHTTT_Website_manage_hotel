@@ -54,27 +54,35 @@ function filterOrders() {
   const statusFilter = document.getElementById('filter-status').value;
   const tableRows = document.querySelectorAll('.order-table tbody tr');
 
-  tableRows.forEach(row => {
-    const invoiceId = row.cells[0].innerText.trim();
-    const invoice = hoa_don.find(h => h.Ma_Hoa_Don === invoiceId);
-    if (!invoice) return row.style.display = 'none';
+  function normalize(date) {
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
 
-    const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === invoice.Ma_don_dat_phong);
+  const start = startDate ? normalize(new Date(startDate)) : null;
+  const end = endDate ? normalize(new Date(endDate)) : null;
+
+  tableRows.forEach(row => {
+    const bookingId = row.cells[0].innerText.trim(); // dùng bookingId vì đây là mã đơn
+    const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === bookingId);
     if (!booking) return row.style.display = 'none';
 
+    const invoice = hoa_don.find(h => h.Ma_don_dat_phong === booking.Ma_don_dat_phong);
+
     const dates = ['Ngay_dat', 'Ngay_nhan', 'Ngay_tra']
-      .map(field => new Date(booking[field]))
+      .map(field => normalize(new Date(booking[field])))
       .filter(d => !isNaN(d.getTime()));
 
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
+    const isInRange = dates.some(date =>
+      (!start || date >= start) && (!end || date <= end)
+    );
 
-    const isInRange = dates.some(date => (!start || date >= start) && (!end || date <= end));
     const matchStatus = !statusFilter || booking.Trang_thai === statusFilter;
 
     row.style.display = (isInRange && matchStatus) ? '' : 'none';
   });
 }
+
 
 function initOrderTab() {
   fetchAllDataOrder();  // Gọi lại API để tải dữ liệu

@@ -1,0 +1,409 @@
+<?php
+    require("database/account.php");
+    session_start();
+    if(@!$_SESSION["user"]){
+        header("Location: ../login.php?op=admin");
+    }
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Account</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+    <div class="admin-panel">
+        <div class="header">
+            <div class="logo">🌇 SUNSET</div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        <hr class="gradient-line">
+        <button class="add-btn" id="addEmployeeBtn">Thêm nhân viên</button>
+        <button class="add-btn" id="addCustomerBtn">Thêm khách hàng</button>
+        <button class="add-btn" id="authorization">Xem quyền</button>
+        <h2 id="welcomeRole">Bảng nhân viên</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã nhân viên</th>
+                    <th>Tên nhân viên</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th>Chức vụ</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Email</th>
+                    <th>Tình trạng</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <?php
+            $account = new account();
+            $account->get_employee();
+            $account->close();
+            ?>
+        </table>
+
+        <h2 id="welecomeRole">Bảng khách hàng</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>CCCD</th>
+                    <th>Tên khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Email</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <?php
+            $account = new account();
+            $account->get_customer();
+            $account->close();
+            ?>
+        </table>
+
+        <form class="add-form" id="addEform" method="get" action="handle/handle_employee.php" onsubmit="return check1()">
+            <h3>Thêm nhân viên</h3>
+            <button type="button" id="closeFormBtn">&times;</button>
+            <input type="text" id="id" name="id" placeholder="Mã nhân viên">
+            <input type="text" id="fullname" name="fullname" placeholder="Họ và tên">
+            <input type="text" id="phone" name="phone" placeholder="Số điện thoại">
+            <input type="text" id="address" name="address" placeholder="Địa chỉ">
+            <input type="text" id="username1" name="username" placeholder="Username">
+            <input type="password" id="password1" name="password" placeholder="Password">
+            <input type="text" id="email" name="email" placeholder="Email">
+            <label for="role">Chức vụ</label>
+            <select id="role" name="role">
+                <option value="Nhân viên">Nhân viên</option>
+                <option value="Quản lý">Quản lý</option>
+                <option value="Admin">Admin</option>
+                <option value="Chủ doanh nghiệp">Chủ doanh nghiệp</option>
+            </select>
+            <input type="hidden" name="op" value="add">
+            <button type="submit">Submit</button>
+        </form>
+        
+        <form class="add-form" id="addCform" method="get" action="handle/handle_customer.php" onsubmit="return check2()">
+            <h3>Thêm khách hàng</h3>
+            <button type="button" id="closeFormBtn1">&times;</button>
+            <input type="text" id="idC" name="id" placeholder="CCCD">
+            <input type="text" id="fullnameC" name="fullname" placeholder="Họ và tên">
+            <input type="text" id="phoneC" name="phone" placeholder="Số điện thoại">
+            <input type="text" id="addressC" name="address" placeholder="Địa chỉ">
+            <input type="text" id="usernameC" name="username" placeholder="Username">
+            <input type="password" id="passwordC" name="password" placeholder="Password">
+            <input type="text" id="emailC" name="email" placeholder="Email">
+            <input type="hidden" name="op" value="add">
+            <button type="submit">Submit</button>
+        </form>
+
+        <form class="add-form" id="updateEform" method="get" action="handle/handle_employee.php">
+            <h3>Sửa thông tin nhân viên</h3>
+            <button type="button" id="closeFormBtn2">&times;</button>
+            <input type="text" id="id2" name="id" placeholder="Mã nhân viên" readonly>
+            <input type="text" id="fullname2" name="fullname" placeholder="Họ và tên">
+            <input type="text" id="phone2" name="phone" placeholder="Số điện thoại">
+            <input type="text" id="address2" name="address" placeholder="Địa chỉ">
+            <input type="hidden" name="op" value="update">
+            <button type="submit">Submit</button>
+        </form>
+
+        <form class="add-form" id="updateCform" method="get" action="handle/handle_customer.php">
+            <h3>Sửa thông tin khách hàng</h3>
+            <button type="button" id="closeFormBtn3">&times;</button>
+            <input type="text" id="idUC" name="id" placeholder="CCCD" readonly>
+            <input type="text" id="fullnameUC" name="fullname" placeholder="Họ và tên">
+            <input type="text" id="phoneUC" name="phone" placeholder="Số điện thoại">
+            <input type="text" id="addressUC" name="address" placeholder="Địa chỉ">
+            <input type="hidden" name="op" value="update">
+            <button type="submit">Submit</button>
+        </form>
+        
+        <div class="add-form" id="show">
+            <button type="button" id="closeFormBtn4">&times;</button>
+            <h2>Bảng quyền</h2>
+            <div>
+                <h3>Khách hàng</h3>
+                <p>-Xem, chỉnh sửa thông tin cá nhân</p>
+                <p>-Đặt phòng, hủy đặt phòng</p>
+                <p>-In đơn đặt phòng</p>
+            </div>
+            <div>
+                <h3>Nhân viên</h3>
+                <p>-Xác nhận/không xác nhận/hủy đơn đặt phòng</p>
+                <p>-Xếp phòng cho từng đơn đặt phòng</p>
+                <p>-Xuất hóa đơn</p>
+                <p>-Thống kê</p>
+            </div>
+            <div>
+                <h3>Admin</h3>
+                <p>-Thêm, sửa, xóa tài khoản nhân viên</p>
+                <p>-Thêm, sửa, xóa tài khoản khách hàng</p>
+            </div>
+            <div>
+                <h3>Quản lý kho</h3>
+                <p>-Thêm, sửa, xóa đồ dùng</p>
+                <p>-Thêm, sửa, xóa nhà cung cấp</p>
+                <p>-Thêm phiếu nhập</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Giao diện chung sau khi đăng nhập -->
+    <!-- <div class="admin-panel hidden">
+        <div class="header">
+            <div class="logo">🌇 SUNSET</div>
+            <button class="logout-btn" onclick="logout()">Logout</button> -->
+    <!-- <button class="logout-btn" onclick="changePassword()">Đổi mật khẩu</button> -->
+    <!-- </div>
+        <hr class="gradient-line"> -->
+
+    <!-- Chào mừng người dùng -->
+    <!-- <h2 id="welcomeRole">Chào mừng</h2> -->
+
+    <!-- Chỉ người có vai trò QUẢN LÝ mới thấy nút này -->
+    <!-- <button class="add-btn hidden" id="addUserBtn" onclick="toggleAddForm()">Thêm</button> -->
+
+    <!-- Bảng người dùng -->
+    <!-- <table> -->
+    <!-- <thead>
+                <tr>
+                    <th>Họ và tên</th>
+                    <th>CCCD</th>
+                    <th>Chức vụ</th>
+                    <th>Tính năng</th>
+                </tr>
+            </thead> -->
+    <!-- <tbody id="userTable"></tbody>
+        </table> -->
+
+    <!-- Form thêm người dùng - chỉ quản lý mới thấy -->
+    <!-- <div class="add-form hidden" id="addForm">
+            <h3>Thêm người dùng</h3>
+            <input type="text" id="fullName" placeholder="Họ và tên">
+            <input type="text" id="cccd" placeholder="CCCD">
+            <input type="text" id="usernameUser" placeholder="Username">
+            <input type="password" id="passwordUser" placeholder="Password">
+            <select id="role">
+                <option value="Quản lý">Quản lý</option>
+                <option value="Khách hàng">Khách hàng</option>
+                <option value="Nhân viên">Nhân viên</option>
+            </select>
+            <button onclick="addUser()">Submit</button>
+        </div>
+    </div> -->
+
+    <!-- Thư viện thông báo + mã hóa -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+
+    <!-- File JS chính -->
+    <!-- <script src="../js/admin.js"></script> -->
+    <?php
+        $account1 = new account();
+        $id = array();
+        $sql1 = "SELECT Ma_nhan_vien FROM nhan_vien";
+        $res1 = mysqli_query($account1->getConnect(), $sql1);
+        // print_r($res1);
+        while ($row1 = mysqli_fetch_array($res1)) {
+            // print_r($row1);
+            $id[] = $row1[0];
+        }
+        $acc1 = array();
+        $sql2 = "SELECT Username FROM account";
+        $res2 = mysqli_query($account1->getConnect(), $sql2);
+        while ($row2 = mysqli_fetch_array($res2)) {
+            $acc1[] = $row2[0];
+        }
+        $account1->close();
+    ?>
+    <?php
+        $account1 = new account();
+        $id = array();
+        $sql1 = "SELECT CCCD FROM khach_hang";
+        $res1 = mysqli_query($account1->getConnect(), $sql1);
+        // print_r($res1);
+        while ($row1 = mysqli_fetch_array($res1)) {
+            // print_r($row1);
+            $id[] = $row1[0];
+        }
+        $acc1 = array();
+        $sql2 = "SELECT Username FROM account";
+        $res2 = mysqli_query($account1->getConnect(), $sql2);
+        while ($row2 = mysqli_fetch_array($res2)) {
+            $acc1[] = $row2[0];
+        }
+        $account1->close();
+    ?>
+    <script>
+        addEform.style.display = "none";
+        addCform.style.display = "none";
+        updateEform.style.display = "none";
+        updateCform.style.display = "none";
+        show.style.display = "none";
+
+        function logout() {
+            alert("Bạn đang đăng xuất");
+            window.location.href = "handle/logout.php";
+        }
+        addEmployeeBtn.addEventListener("click", function() {
+            addEform.style.display = "block";
+            addCform.style.display = "none";
+            updateCform.style.display = "none";
+            updateEform.style.display = "none";
+            show.style.display = "none";
+        })
+        addCustomerBtn.addEventListener("click", function() {
+            addCform.style.display = "block";
+            addEform.style.display = "none";
+            updateCform.style.display = "none";
+            updateEform.style.display = "none";
+            show.style.display = "none";
+        })
+        closeFormBtn.addEventListener("click", function() {
+            addEform.style.display = "none";
+        })
+        closeFormBtn1.addEventListener("click", function() {
+            addCform.style.display = "none";
+        })
+        closeFormBtn2.addEventListener("click", function() {
+            updateEform.style.display = "none";
+        })
+        closeFormBtn3.addEventListener("click", function() {
+            updateCform.style.display = "none";
+        })
+        closeFormBtn4.addEventListener("click", function() {
+            show.style.display = "none";
+        })
+        authorization.addEventListener("click", function(){
+            show.style.display = "block";
+            addEform.style.display = "none";
+            addCform.style.display = "none";
+            updateCform.style.display = "none";
+            updateEform.style.display = "none";
+        })
+
+        function check1() {
+            // alert("Hello World");
+            var id = document.getElementById("id");
+            var ids = <?php echo json_encode($id) ?>;
+            var username = document.getElementById("username1");
+            var acc = <?php echo json_encode($acc1) ?>;
+            var email = document.getElementById("email");
+            var name = document.getElementById("fullname");
+            var phone = document.getElementById("phone");
+            var address = document.getElementById("address");
+            var pass = document.getElementById("password1");
+            if (!id.value || !username.value || !email.value || !name.value || !phone.value || !address.value || !pass.value) {
+                alert("Vui lòng điền đầy đủ thông tin");
+            }
+            const regex = /^NV[0-9]{3}$/;
+            if (!regex.test(id.value)) {
+                alert("Mã nhân viên bắt đầu từ NV và đằng sau phải có 3 số");
+                id.focus();
+                return false;
+            }
+            for (var i = 0; i < ids.length; i++) {
+                if (id.value == ids[i]) {
+                    alert("Đã có mã nhân viên!");
+                    id.focus();
+                    return false;
+                }
+            }
+            for (var i = 0; i < acc.length; i++) {
+                if (username.value == acc[i]) {
+                    alert("Đã có tài khoản này rồi");
+                    username.focus();
+                    return false;
+                }
+            }
+            const regex1 = /@gmail.com$/;
+            if (!regex1.test(email.value)) {
+                alert("Email phải có @gmail.com đằng sau");
+                email.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function check2() {
+            var id = document.getElementById("idC");
+            var ids = <?php echo json_encode($id) ?>;
+            var username = document.getElementById("usernameC");
+            var acc = <?php echo json_encode($acc1) ?>;
+            var email = document.getElementById("emailC");
+            var name = document.getElementById("fullnameC");
+            var phone = document.getElementById("phoneC");
+            var address = document.getElementById("addressC");
+            var pass = document.getElementById("passwordC");
+            if (!id.value || !username.value || !email.value || !name.value || !phone.value || !address.value || !pass.value) {
+                alert("Vui lòng điền đầy đủ thông tin");
+            }
+            const regex = /^[0-9]{12}$/;
+            if (!regex.test(id.value)) {
+                alert("CCCD phải có đủ 12 chữ số");
+                id.focus();
+                return false;
+            }
+            for (var i = 0; i < ids.length; i++) {
+                if (id.value == ids[i]) {
+                    alert("CCCD bị trùng");
+                    id.focus();
+                    return false;
+                }
+            }
+            for (var i = 0; i < acc.length; i++) {
+                if (username.value == acc[i]) {
+                    alert("Đã có tài khoản này rồi");
+                    username.focus();
+                    return false;
+                }
+            }
+            const regex1 = /@gmail.com$/;
+            if (!regex1.test(email.value)) {
+                alert("Email phải có @gmail.com đằng sau");
+                email.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function update(element) {
+            updateEform.style.display = "block";
+            updateCform.style.display = "none";
+            addCform.style.display = "none";
+            addEform.style.display = "none";
+            show.style.display = "none";
+            let tmp = element.parentNode.parentNode;
+            let td = tmp.querySelectorAll('td');
+            console.log(td);
+            document.getElementById("id2").value = td[0].innerHTML;
+            document.getElementById("fullname2").value = td[1].innerHTML;
+            document.getElementById("phone2").value = td[2].innerHTML;
+            document.getElementById("address2").value = td[3].innerHTML;
+        }
+
+        function update1(element) {
+            updateCform.style.display = "block";
+            updateEform.style.display = "none";
+            addCform.style.display = "none";
+            addEform.style.display = "none";
+            show.style.display = "none";
+            let tmp = element.parentNode.parentNode;
+            let td = tmp.querySelectorAll('td');
+            console.log(td);
+            document.getElementById("idUC").value = td[0].innerHTML;
+            document.getElementById("fullnameUC").value = td[1].innerHTML;
+            document.getElementById("phoneUC").value = td[2].innerHTML;
+            document.getElementById("addressUC").value = td[3].innerHTML;
+        }
+    </script>
+</body>
+
+</html>

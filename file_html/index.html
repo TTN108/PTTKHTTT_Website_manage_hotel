@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đồ dùng</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <div class="sidebar">
+    <button class="menu-toggle">☰</button>
+    <button id="inventory" class="tab active">
+        <i class="fa-solid fa-box-open"></i> <span class="text">Đồ dùng</span>
+    </button>
+    <button id="import_contract" class="tab">
+        <i class="fas fa-file-invoice"></i> <span class="text">Đơn nhập hàng</span>
+    </button>
+    </div>
+
+    
+    <div id="container1" class="container1">
+        <div class="header-container">
+            <div class="header">
+                <h2>Quản lý đồ dùng</h2>
+                <button id="addItemBtn" class="add-btn">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="find_Item" class="find_Item">
+            <input type="text" id="searchInput" placeholder="Nhập tên hoặc mã sản phẩm để tìm...">
+            <button id="searchBtn">
+                <i class="fas fa-search"></i> Tìm kiếm
+            </button>
+        </div>
+        
+        
+        <div class="content-container">
+            <table id="itemTable" class="item-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên</th>
+                        <th>Loại</th>
+                        <th>Số lượng</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>...</td>
+                        <td class="item-img">...</td>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                </tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="addItemForm" class="form-container">
+            <button id="closeFormBtn1" class="close-btn">&times;</button>
+            <h3>Thêm dụng cụ</h3>
+            <input type="text" id="name" placeholder="Tên sản phẩm">
+            
+            <input type="text" id="id" placeholder="Mã sản phẩm">
+
+            <input type="file" id="image" placeholder="Hình ảnh">
+            
+            <input type="text" id="category" placeholder="Loại">
+                    
+            <input type="number" id="quantity" placeholder="Số lượng">
+            
+            <div class="form-buttons">
+                <button type="submit" id="submitBtn">Thêm</button>
+                <button type="reset" id="resetBtn">Reset</button>
+            </div>
+        </div>
+
+        <div id="overlay" style="display: none;"></div>
+        
+        <div id="editItemForm" class="edit-form-container">
+            <button id="closeEditFormBtn" class="close-btn">&times;</button>
+            <h3>Chỉnh sửa sản phẩm</h3>
+            <div class="edit-form-content">
+                <div class="info-section">
+                    <label for="editName">Tên:</label>
+                    <input type="text" id="editName" value="">
+                    
+                    <label for="editID">ID:</label>
+                    <input type="text" id="editID" value="" disabled>
+                    
+                    <label for="editCategory">Loại:</label>
+                    <input type="text" id="editCategory" value="">
+                    
+                    <label for="editQuantity">Số lượng:</label>
+                    <input type="number" id="editQuantity" value="">
+                </div>
+                <div class="image-section">
+                    <img id="previewImage" src="" alt="Hình ảnh sản phẩm">
+                    <input type="file" id="editImage">
+                </div>
+            </div>
+            <div class="form-buttons">
+                <button id="saveEditBtn">Lưu</button>
+                <button id="cancelEditBtn">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="container2" class="container2">
+        <div class="header">
+            <h2>Thông tin đơn hàng</h2>
+            <button id="addOrderBtn" class="add-btn">
+                <i class="fas fa-plus-circle"></i>
+            </button>
+        </div>
+    
+        <div class="content-container">
+            <table id="orderTable" class="item-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Chi tiết đơn hàng</th>
+                        <th>Ngày cung cấp</th>
+                        <th>Nơi cung cấp</th>
+                        <th>Giá</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                </tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="addOrderForm" class="form-container">
+            <button id="closeOrderForm" class="close-btn">&times;</button>
+            <h3>Thêm đơn hàng mới</h3>
+            <input type="text" id="orderId" placeholder="Mã đơn hàng: ">
+
+            <textarea id="orderDetail" placeholder="Nhập chi tiết đơn hàng..." rows="4"></textarea>
+            <input type="date" id="date">
+            
+            <input type="text" id="supplier" placeholder="Nơi cung cấp:">
+            
+            <input type="number" id="price" placeholder="Giá:">
+            
+            <label for="status">Trạng thái:</label>
+            <div class="radio-group">
+                <input type="radio" id="provided" name="status" value="Đã nhận hàng">
+                <label for="provided">Đã nhận hàng</label>
+
+                <input type="radio" id="not_provided" name="status" value="Chưa nhận hàng">
+                <label for="not_provided">Chưa nhận hàng</label>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" id="submitOrder">Thêm</button>
+                <button type="reset" id="resetOrder">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Account</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body onload="initializeApp()">
+    <div class="login-container">
+        <div class="background-image">
+            <div class="login-form">
+                <h2>Login</h2>
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+                <button onclick="login()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Giao diện chung sau khi đăng nhập -->
+    <div class="admin-panel hidden">
+        <div class="header">
+            <div class="logo">🌇 SUNSET</div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            <!-- <button class="logout-btn" onclick="changePassword()">Đổi mật khẩu</button> -->
+        </div>
+        <hr class="gradient-line">
+
+        <!-- Chào mừng người dùng -->
+        <h2 id="welcomeRole">Chào mừng</h2>
+
+        <!-- Chỉ người có vai trò QUẢN LÝ mới thấy nút này -->
+        <button class="add-btn hidden" id="addUserBtn" onclick="toggleAddForm()">Thêm</button>
+
+        <!-- Bảng người dùng -->
+        <table>
+            <!-- <thead>
+                <tr>
+                    <th>Họ và tên</th>
+                    <th>CCCD</th>
+                    <th>Chức vụ</th>
+                    <th>Tính năng</th>
+                </tr>
+            </thead> -->
+            <tbody id="userTable"></tbody>
+        </table>
+
+        <!-- Form thêm người dùng - chỉ quản lý mới thấy -->
+        <div class="add-form hidden" id="addForm">
+            <h3>Thêm người dùng</h3>
+            <input type="text" id="fullName" placeholder="Họ và tên">
+            <input type="text" id="cccd" placeholder="CCCD">
+            <input type="text" id="usernameUser" placeholder="Username">
+            <input type="password" id="passwordUser" placeholder="Password">
+            <select id="role">
+                <option value="Quản lý">Quản lý</option>
+                <option value="Khách hàng">Khách hàng</option>
+                <option value="Nhân viên">Nhân viên</option>
+            </select>
+            <button onclick="addUser()">Submit</button>
+        </div>
+    </div>
+
+    <!-- Thư viện thông báo + mã hóa -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+
+    <!-- File JS chính -->
+    <script src="../js/admin.js"></script>
+</body>
+</html>

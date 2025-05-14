@@ -1,0 +1,185 @@
+/* ====== NỀN TOÀN TRANG ====== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    /* background-image: url('./img/hinh2.png');  Ảnh nền xung quanh */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #000;
+    height: 100vh;
+}
+
+/* ====== LOGIN CONTAINER ====== */
+.login-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ====== KHUNG LOGIN (CÓ ẢNH RIÊNG) ====== */
+.background-image {
+    width: 500px;  /* To hơn */
+    height: 350px;
+    /* background-image: url('./img/hinh1.png');  Ảnh nền khung login */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+/* ====== FORM LOGIN TRONG KHUNG ====== */
+.login-form {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    width: 95%;
+    box-shadow: 0 0 10px #aaa;
+    transition: all 0.3s ease-in-out;
+}
+
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.login-form input {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.login-form button {
+    width: 100%;
+    padding: 8px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    font-size: 16px;
+}
+
+.login-form button:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+/* ====== ADMIN PANEL ====== */
+.hidden { display: none; }
+
+.admin-panel { padding: 20px; }
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout-btn, .add-btn {
+    background-color: #3498db;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.logout-btn:hover, .add-btn:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+.gradient-line {
+    height: 4px;
+    background: linear-gradient(to right, #ff6a00, #ffee00);
+    border: none;
+    margin: 10px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    color: #000;
+    box-shadow: 0 0 5px #aaa;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.add-form {
+    background-color: white;
+    color: black;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px #aaa;
+    transition: all 0.3s ease-in-out;
+}
+
+.add-form input, .add-form select {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 6px;
+    border: 1px solid #ccc;
+}
+
+.add-form button {
+    background-color: #3498db;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.add-form button:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 600px) {
+    .background-image {
+        width: 90%;
+        height: auto;
+    }
+
+    .login-form {
+        width: 90%;
+        top: 10%;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    .add-form {
+        width: 90%;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

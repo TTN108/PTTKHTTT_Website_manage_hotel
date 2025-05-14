@@ -1,0 +1,285 @@
+/* ------------------------------------- Content ----------------------------------------- */
+#content {
+    padding: 10px;
+}
+
+/* --------------------------------- Banner ----------------------------------------- */
+#hero-banner-container {
+    margin-top: 90px;
+    width: 100%;
+}
+
+#hero-banner {
+    width: 100%;
+}
+
+/* --------------------------------- Home Block ----------------------------------------- */
+
+/* --------------------------------- Mini Booking Form ----------------------------------------- */
+#mini-booking-form-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100px;
+    margin-top: -50px;
+}
+
+#mini-booking-form {
+    display: block;
+    width: 80%;
+    font-size: 20px;
+    justify-content: center;
+    align-items: center;
+    background-color: whitesmoke;
+    padding: 10px;
+}
+
+#label-group {
+    display: flex;
+    justify-content: left;
+    margin-bottom: 20px;
+}
+
+#input-group {
+    display: flex;
+}
+
+.mini-container {
+    width: 20%;
+}
+
+.mini-form-input {
+    cursor: pointer;
+    border: 2px solid black;
+    width: 80%;
+    height: 30px;
+    font-size: 15px;
+}
+
+/* ------------------------- Hero Section ------------------------------- */
+#hero-section-container {
+    margin-top: 20px;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    text-align: center;
+}
+
+/* ------------------------- Room Selection ----------------------------- */
+#room-selection-container {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.room-card {
+    margin: 10px;
+    font-size: 24px;
+    text-align: center;
+    background-color: whitesmoke;
+}
+
+.room-image {
+    width: 512px;
+    height: 385px;
+}
+
+.room-card p {
+    margin: 40px;
+}
+
+.room-detail-button {
+    cursor: pointer;
+    border: none;
+    width: 20%;
+    background-color: rgb(225, 225, 225);
+    margin-bottom: 30px;
+    font-size: 24px;
+    padding: 10px;
+}
+
+.room-detail-button:hover
+{
+    background: lightgray;
+}
+/* ---------------------------------- Room Block ----------------------------------------- */
+#room-block.active
+{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.room-block-room-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+    height: fit-content;
+    background: whitesmoke;
+}
+
+.room-block-room-info {
+    width: 50%;
+    text-align: center;
+    line-height: 50px;
+    flex: 1;
+    font-size: 25px;
+}
+
+.room-block-room-info .room-detail-button
+{
+    margin-top: 5%;
+}
+
+.room-block-room-image
+{
+    width: 50%;
+}
+
+.room-block-room-image img {
+    width: 100%;
+}
+
+#detail-room-ctn
+{
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    height: 99vh;
+    width: 60%;
+}
+
+#detail-room-ctn.active
+{
+    display: block;
+}
+
+.x-ctn
+{
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    border-radius: 100%;
+    background-color: whitesmoke;
+}
+
+.x-ctn:hover 
+{
+    cursor: pointer;
+    background-color: lightgray;
+}
+
+.x
+{
+    color: gray;
+    width: 40px;
+    text-align: center;
+    font-size: 30px;
+    line-height: 40px;
+}
+
+#detail-room-ctn h1
+{
+    margin: 10px;
+}
+
+#detail-room-img
+{
+    width: 50%;
+}
+
+#detail > p
+{
+    width: 90%;
+    font-size: 20px;
+    line-height: 40px;
+    text-align: left;
+}   
+
+#detail > h2
+{
+    width: 90%;
+    font-size: 20px;
+    line-height: 40px;
+    text-align: left;
+    margin-top: 10px;
+}   
+
+#detail
+{
+    height: 85vh;
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 40px;
+}
+
+#room-book-now-btn
+{
+    padding: 10px 40px 10px 40px;
+    display: flex;
+    flex-direction: row;
+}
+
+#room-book-now-btn h1
+{
+    width: 80%;
+}
+
+#room-book-now-btn button
+{
+    font-size: 18px;
+    width: 20%;
+}
+
+/* --------------------------------- About Us Block -------------------------------------- */
+#about-us-textfield {
+    margin: 40px auto;
+    width: 60%;
+    text-wrap: wrap;
+}
+
+/* --------------------------------- Contact Block --------------------------------------- */
+#contact-form {
+    margin: 40px auto;
+    width: 60%;
+}
+
+#contact-field {
+    display: flex;
+    flex-direction: column;
+    font-size: 24px;
+    margin: 20px 0px 20px 0px;
+}
+
+.contact-input {
+    border: 2px solid black;
+    height: 40px;
+    font-size: 16px;
+    background-color: whitesmoke;
+    padding: 0px 10px 0px 10px
+}
+
+.contact-input.textarea {
+    padding: 10px 10px 10px 10px;
+    height: 200px;
+}
+
+#invalid-email {
+    color: red;
+    display: none;
+}
+
+#invalid-email.active {
+    display: block;
+}
+

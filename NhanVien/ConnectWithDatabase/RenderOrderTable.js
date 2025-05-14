@@ -212,9 +212,9 @@ function showOrderDetail(invoiceId) {
   const booking = don_dat_phong.find(d => d.Ma_don_dat_phong === invoiceId);
   const invoice = hoa_don.find(h => h.Ma_don_dat_phong === invoiceId);
   if (!invoice) return;
-  console.log(invoice);
+  console.log("Hoá đơn: " + invoice);
   if (!booking) return;
-  console.log(booking);
+  console.log("Đơn đặt phòng: " + booking);
   const customer = khach_hang.find(k => k.Account === booking.Account);
   let Room = [];
   let count = 0;
@@ -224,7 +224,7 @@ function showOrderDetail(invoiceId) {
     Room.push(room.ID);
     count++;
   });
-  console.log(Room);
+  console.log("Phòng: " + Room);
   const roomType = booking ? loai_phong.find(lp => lp.Ma_Loai_Phong === booking.Ma_Loai_Phong) : null;
 
   // Màu header theo loại phòng
@@ -252,7 +252,7 @@ function showOrderDetail(invoiceId) {
     RoomName += Room[i] + '\t';
     i++;
   } while ((Room.length - 1) == i);
-  console.log(RoomName)
+  console.log("Tên phòng:" + RoomName)
   const form = document.getElementById('checkout-form');
   form.innerHTML = `
     <h2 style="background-color: ${headerBg};">
@@ -331,7 +331,22 @@ function generatePDF(invoiceId) {
       },
       { text: 'Đồ dùng sử dụng:', style: 'subheader' },
       objectInRoom.length > 0 ? {
-        ul: objectInRoom.map(obj => `${obj.Ten} (${Number(obj.Gia).toLocaleString('vi-VN')} VND)`)
+        table: {
+          headerRows: 1,
+          widths: ['auto', '*', 'auto', 'auto', 'auto'],
+          body: [
+            ['STT', 'Tên đồ dùng', 'Số lượng', 'Đơn giá', 'Thành tiền'],
+            ...objectInRoom.map((obj, index) => [
+              index + 1,
+              obj.Ten,
+              1,
+              `${Number(obj.Gia).toLocaleString('vi-VN')} VND`,
+              `${Number(obj.Gia).toLocaleString('vi-VN')} VND`
+            ])
+          ]
+        },
+        layout: 'lightHorizontalLines',
+        margin: [0, 10, 0, 10]
       } : { text: 'Không sử dụng đồ dùng nào.' },
       {
         text: `Tổng tiền: ${totalPrice.toLocaleString('vi-VN')} VND`,

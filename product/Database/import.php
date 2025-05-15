@@ -51,6 +51,9 @@
                     <td>
                         $s1
                     </td>
+                    <td>
+                        <button type='button' onclick='print(this)'>In</button>
+                    </td>
                 </tr>
             </tbody>";
             }

@@ -1,6 +1,9 @@
 <?php
-require("database/account.php");
-session_start();
+    require("database/account.php");
+    session_start();
+    if(@!$_SESSION["user"]){
+        header("Location: ../login.php?op=admin");
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,17 +15,6 @@ session_start();
 </head>
 
 <body>
-    <form class="login-container" onsubmit="return check()" method="get" action="handle/login.php">
-        <div class="background-image">
-            <div class="login-form">
-                <h2>Login</h2>
-                <input type="text" id="username" name="username" placeholder="Username">
-                <input type="password" id="password" name="password" placeholder="Password">
-                <button type="submit">Submit</button>
-            </div>
-        </div>
-    </form>
-
     <div class="admin-panel">
         <div class="header">
             <div class="logo">🌇 SUNSET</div>
@@ -31,6 +23,7 @@ session_start();
         <hr class="gradient-line">
         <button class="add-btn" id="addEmployeeBtn">Thêm nhân viên</button>
         <button class="add-btn" id="addCustomerBtn">Thêm khách hàng</button>
+        <button class="add-btn" id="authorization">Xem quyền</button>
         <h2 id="welcomeRole">Bảng nhân viên</h2>
         <table>
             <thead>
@@ -65,6 +58,7 @@ session_start();
                     <th>Username</th>
                     <th>Password</th>
                     <th>Email</th>
+                    <th>Tình trạng</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -131,6 +125,36 @@ session_start();
             <input type="hidden" name="op" value="update">
             <button type="submit">Submit</button>
         </form>
+        
+        <div class="add-form" id="show">
+            <button type="button" id="closeFormBtn4">&times;</button>
+            <h2>Bảng quyền</h2>
+            <div>
+                <h3>Khách hàng</h3>
+                <p>-Xem, chỉnh sửa thông tin cá nhân</p>
+                <p>-Đặt phòng, hủy đặt phòng</p>
+                <p>-In đơn đặt phòng</p>
+            </div>
+            <div>
+                <h3>Nhân viên</h3>
+                <p>-Xác nhận/không xác nhận/hủy đơn đặt phòng</p>
+                <p>-Xếp phòng cho từng đơn đặt phòng</p>
+                <p>-Xuất hóa đơn</p>
+                <p>-Thống kê</p>
+            </div>
+            <div>
+                <h3>Admin</h3>
+                <p>-Thêm, sửa, khóa, mở khóa tài khoản nhân viên</p>
+                <p>-Thêm, sửa, khóa, mở khóa tài khoản khách hàng</p>
+
+            </div>
+            <div>
+                <h3>Quản lý kho</h3>
+                <p>-Thêm, sửa, xóa đồ dùng</p>
+                <p>-Thêm, sửa, xóa nhà cung cấp</p>
+                <p>-Thêm phiếu nhập</p>
+            </div>
+        </div>
     </div>
 
     <!-- Giao diện chung sau khi đăng nhập -->
@@ -184,31 +208,6 @@ session_start();
     <!-- File JS chính -->
     <!-- <script src="../js/admin.js"></script> -->
     <?php
-        if ($_SESSION['user']) {
-            echo "<script>
-                    document.getElementsByClassName('login-container')[0].style.display = 'none';
-                    document.getElementsByClassName('admin-panel')[0].style.display = 'block';
-                </script>";
-        } else {
-            echo "<script>
-                    document.getElementsByClassName('login-container')[0].style.display = 'flex';
-                    document.getElementsByClassName('admin-panel')[0].style.display = 'none';
-                </script>";
-        }
-        $account = new account();
-        $acc = array();
-        $pass = array();
-        $job = array();
-        $sql = "SELECT account.Username, account.Password, nhan_vien.Chuc_vu FROM account, nhan_vien WHERE account.Username = nhan_vien.Account";
-        $res = mysqli_query($account->getConnect(), $sql);
-        while ($row = mysqli_fetch_array($res)) {
-            $acc[] = $row[0];
-            $pass[] = $row[1];
-            $job[] = $row[2];
-        }
-        $account->close();
-    ?>
-    <?php
         $account1 = new account();
         $id = array();
         $sql1 = "SELECT Ma_nhan_vien FROM nhan_vien";
@@ -249,25 +248,7 @@ session_start();
         addCform.style.display = "none";
         updateEform.style.display = "none";
         updateCform.style.display = "none";
-
-        function check() {
-            var username = document.getElementById("username");
-            var password = document.getElementById("password");
-            var users = <?php echo json_encode($acc) ?>;
-            var passes = <?php echo json_encode($pass) ?>;
-            var job = <?php echo json_encode($job) ?>;
-            if (!username.value || !password.value) {
-                alert("Vui lòng nhập đầy đủ!");
-                return false;
-            }
-            for (var i = 0; i < users.length; i++) {
-                if (username.value == users[i] && password.value == passes[i] && (job[i] == "Chủ doanh nghiệp" || job[i] == "Admin")) {
-                    return true;
-                }
-            }
-            alert("Đang sai tài khoản hoặc mật khẩu hoặc bạn không phải là chủ doanh nghiệp hoặc admin");
-            return false;
-        }
+        show.style.display = "none";
 
         function logout() {
             alert("Bạn đang đăng xuất");
@@ -278,12 +259,14 @@ session_start();
             addCform.style.display = "none";
             updateCform.style.display = "none";
             updateEform.style.display = "none";
+            show.style.display = "none";
         })
         addCustomerBtn.addEventListener("click", function() {
             addCform.style.display = "block";
             addEform.style.display = "none";
             updateCform.style.display = "none";
             updateEform.style.display = "none";
+            show.style.display = "none";
         })
         closeFormBtn.addEventListener("click", function() {
             addEform.style.display = "none";
@@ -296,6 +279,16 @@ session_start();
         })
         closeFormBtn3.addEventListener("click", function() {
             updateCform.style.display = "none";
+        })
+        closeFormBtn4.addEventListener("click", function() {
+            show.style.display = "none";
+        })
+        authorization.addEventListener("click", function(){
+            show.style.display = "block";
+            addEform.style.display = "none";
+            addCform.style.display = "none";
+            updateCform.style.display = "none";
+            updateEform.style.display = "none";
         })
 
         function check1() {
@@ -388,6 +381,7 @@ session_start();
             updateCform.style.display = "none";
             addCform.style.display = "none";
             addEform.style.display = "none";
+            show.style.display = "none";
             let tmp = element.parentNode.parentNode;
             let td = tmp.querySelectorAll('td');
             console.log(td);
@@ -402,6 +396,7 @@ session_start();
             updateEform.style.display = "none";
             addCform.style.display = "none";
             addEform.style.display = "none";
+            show.style.display = "none";
             let tmp = element.parentNode.parentNode;
             let td = tmp.querySelectorAll('td');
             console.log(td);

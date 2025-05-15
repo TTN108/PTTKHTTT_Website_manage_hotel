@@ -392,6 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }  
     const nv = nhan_vien.find(nv => nv.Account === currentUsername);
     idNV = nv.Ma_nhan_vien;
+    console.log(idNV);
     try {
       const res = await fetch('ConnectWithDatabase/ConfirmBooking.php', {
         method: 'POST',
@@ -476,7 +477,7 @@ async function showNewBookingForm() {
   if (isStaff) {
     alert("⚠️ Tài khoản này là của nhân viên, không được phép đặt phòng!");
     inputUsername.value = '';
-    inputUsername.focus();
+    form.querySelector('input[name="So_luong_phong"]').value = '';    inputUsername.focus();
     return;
   }
   // Nếu thiếu CCCD hoặc Username thì chưa kiểm tra
@@ -504,9 +505,11 @@ async function showNewBookingForm() {
   // Xác định chỗ sai để focus
   if (!kh) {
     inputCCCD.value = '';
+    form.querySelector('input[name="So_luong_phong"]').value = '';
     inputCCCD.focus();
   } else {
     inputUsername.value = '';
+    form.querySelector('input[name="So_luong_phong"]').value = '';
     inputUsername.focus();
   }
 
@@ -759,7 +762,7 @@ async function showNewBookingForm() {
 
     const nv = nhan_vien.find(nv => nv.Account === currentUsername);
     const idNV = nv.Ma_nhan_vien;
-
+    console.log(idNV);
     try {
       const res = await fetch("ConnectWithDatabase/insert_checkin.php", {
         method: "POST",

@@ -1,5 +1,8 @@
 <?php
-  session_start();
+session_start();
+if (@!$_SESSION["user"]) {
+  header("Location: ../login.php?op=employee");
+}
 ?>
 
 <!DOCTYPE html>
@@ -15,16 +18,6 @@
 </head>
 
 <body>
-  <form class="login-container" onsubmit="return check_login()" method="get" action="handle/login.php">
-    <div class="background-image">
-      <div class="login-form">
-        <h2>Login</h2>
-        <input type="text" id="username" name="username" placeholder="Username">
-        <input type="password" id="password" name="password" placeholder="Password">
-        <button type="submit">Submit</button>
-      </div>
-    </div>
-  </form>
   <!-- Sidebar -->
   <div class="sidebar">
     <a href="#" id="hotelLink" onclick="renderHotelLayout()">Sơ đồ khách sạn</a>
@@ -220,37 +213,6 @@
   <script src="./ConnectWithDatabase/RenderOrderTable.js"></script>
   <script src="./Interface.js"></script>
   <script src="Script.js"></script>
-  <?php
-  if (@$_SESSION['user']) {
-    echo "<script>
-    document.getElementsByClassName('login-container')[0].style.display = 'none';
-    document.getElementsByClassName('header-bar')[0].style.display = 'block';
-    document.getElementsByClassName('sidebar')[0].style.display = 'block';
-    document.getElementsByClassName('hotel-layout')[0].style.display = 'block';
-    document.getElementById('hotelLayout').style.display = 'block';
-    </script>";
-  } else {
-    echo "<script>
-    document.getElementsByClassName('login-container')[0].style.display = 'flex';
-    document.getElementsByClassName('header-bar')[0].style.display = 'none';
-    document.getElementsByClassName('sidebar')[0].style.display = 'none';
-    document.getElementsByClassName('hotel-layout')[0].style.display = 'none';
-    document.getElementById('hotelLayout').style.display = 'none';
-    </script>";
-  }
-  $con = mysqli_connect("localhost", "root", "", "hotel");
-  $acc = array();
-  $pass = array();
-  $job = array();
-  $sql = "SELECT account.Username, account.Password, nhan_vien.Chuc_vu FROM account, nhan_vien WHERE account.Username = nhan_vien.Account";
-  $res = mysqli_query($con, $sql);
-  while ($row = mysqli_fetch_array($res)) {
-    $acc[] = $row[0];
-    $pass[] = $row[1];
-    $job[] = $row[2];
-  }
-  mysqli_close($con);
-  ?>
   <script>
     let chartInstance = null;
 

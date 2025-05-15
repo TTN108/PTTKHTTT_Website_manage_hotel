@@ -21,11 +21,18 @@
         $account->update_customer($id, $name, $phone, $address);
         $account->close();
     }
-    if($_GET["op"] == "delete"){
+    if($_GET["op"] == "lock"){
         $account = new account();
         $id = $_GET["id"];
         $username = $_GET["username"];
-        $account->del_customer($id, $username);
+        $account->lock_customer($username);
+        $account->close();
+    }
+    if($_GET["op"] == "unlock"){
+        $account = new account();
+        $id = $_GET["id"];
+        $username = $_GET["username"];
+        $account->unlock_customer($username);
         $account->close();
     }
 ?>

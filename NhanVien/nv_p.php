@@ -67,6 +67,7 @@ if (@!$_SESSION["user"]) {
   <div class="order-content" id="orderContent">
     <!-- Thanh chọn ngày -->
     <div class="order-header" id="orderHeader">
+      <input type="text" id="search-input" placeholder="Tìm theo tên, mã đơn, mã loại phòng">
       <label for="start-date">Ngày</label>
       <input type="date" id="start-date" />
       <span>đến</span>

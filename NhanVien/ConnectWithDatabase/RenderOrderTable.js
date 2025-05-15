@@ -12,6 +12,7 @@ async function fetchAllDataOrder() {
     chi_tiet_phong = [];
     selectedRooms = [];
     booking = {};
+    document.getElementById('search-input').value = '';
     try {
         const [roomsRes, roomTypesRes, customersRes, invoicesRes, objectsRes, accountsRes, orderDetailRes, roomDetailsRes, applyFormRes, detailsRes] = await Promise.all([
             fetch('ConnectWithDatabase/get_rooms.php'),
@@ -171,6 +172,7 @@ function renderOrderTable() {
 
 // Đoạn mã này sẽ được thực thi khi trang đã tải xong
 function filterOrders() {
+  const searchValue = document.getElementById('search-input').value.trim().toLowerCase();
   const startDate = document.getElementById('start-date').value;
   const endDate = document.getElementById('end-date').value;
   const statusFilter = document.getElementById('filter-status').value;
@@ -198,13 +200,20 @@ function filterOrders() {
     const isInRange = dates.some(date =>
       (!start || date >= start) && (!end || date <= end)
     );
+    const customer = khach_hang.find(k => k.Account === booking.Account);
+    const customerName = customer?.Ten?.toLowerCase() || '';
+    const matchSearch =
+    !searchValue ||
+    booking.Ma_don_dat_phong.toLowerCase().includes(searchValue) ||
+    booking.Ma_Loai_Phong.toLowerCase().includes(searchValue) ||
+    customerName.includes(searchValue);
 
     const matchStatus = !statusFilter || booking.Trang_thai === statusFilter;
 
-    row.style.display = (isInRange && matchStatus) ? '' : 'none';
+    row.style.display = (isInRange && matchStatus && matchSearch) ? '' : 'none';
   });
 }
-
+document.getElementById('search-input').addEventListener('input', filterOrders);
 
 
 

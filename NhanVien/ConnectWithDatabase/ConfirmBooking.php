@@ -25,12 +25,11 @@ try {
     // Thêm chi tiết hóa đơn
     $stmt_ct = $conn->prepare("INSERT INTO chi_tiet_hoa_don (Ma_Hoa_Don, Ma_phong) VALUES (?, ?)");
     $stmt_update = $conn->prepare("UPDATE phong SET Trang_thai = 'Có người ở' WHERE ID = ?");
+    $stmt_ct->bind_param("is", $ma_hoa_don, $room_id);
+    $stmt_update->bind_param("s", $room_id);
     foreach ($phong_ids as $room_id) {
-        $stmt_ct->bind_param("is", $ma_hoa_don, $room_id);
         $stmt_ct->execute();
-
         // Cập nhật trạng thái phòng
-        $stmt_update->bind_param("s", $room_id);
         $stmt_update->execute();
     }
     $stmt_ap = $conn->prepare("UPDATE don_dat_phong SET Trang_thai = 'Đã nhận phòng' WHERE Ma_don_dat_phong = ?");

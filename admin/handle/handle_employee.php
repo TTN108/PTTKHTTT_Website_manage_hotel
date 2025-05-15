@@ -13,11 +13,18 @@
         $account->insert_employee($id, $name, $phone, $address, $username, $pass, $email, $role);
         $account->close();
     }
-    if($_GET["op"] == "delete"){
+    if($_GET["op"] == "lock"){
         $account = new account();
         $id = $_GET["id"];
         $username = $_GET["username"];
-        $account->del_employee($id, $username);
+        $account->lock_employee($username);
+        $account->close();
+    }
+    if($_GET["op"] == "unlock"){
+        $account = new account();
+        $id = $_GET["id"];
+        $username = $_GET["username"];
+        $account->unlock_employee($username);
         $account->close();
     }
     if($_GET["op"] == "update"){

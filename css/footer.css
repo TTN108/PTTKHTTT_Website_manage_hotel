@@ -1,0 +1,10 @@
+/* ------------------------------------- Footer ----------------------------------------- */
+#footer {
+    background-color: whitesmoke;
+    padding: 30px;
+}
+
+#address-block {
+    width: 30%;
+    text-wrap: wrap;
+}

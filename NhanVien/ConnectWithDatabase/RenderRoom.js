@@ -306,8 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-  
-    checkForCheckOut().then(() => { console.log('Check out đang chạy'); });
   });
   
   function showBookedList(bookedList) {
@@ -426,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           //await fetchAllDataRoom();
           renderRoom();
-          await refreshCheckOutStatus();
+          //await refreshCheckOutStatus();
           const remaining = don_dat_phong.filter(don =>
             !hoa_don.some(hd => hd.Ma_don_dat_phong === don.Ma_don_dat_phong)
           );
@@ -526,7 +524,7 @@ async function showNewBookingForm() {
     const quantityInput = form.querySelector('input[name="So_luong_phong"]');
     const peopleInput = form.querySelector('input[name="So_luong_nguoi"]');
     const ngayTraInput = form.querySelector('input[name="Ngay_tra"]');
-
+    selectedRooms = [];
     const cccd = inputCCCD.value.trim();
     const username = inputUsername.value.trim();
     const soLuongPhong = parseInt(quantityInput.value);
@@ -794,10 +792,8 @@ async function showNewBookingForm() {
           if (newCustomerFields) newCustomerFields.style.display = 'none';
         }
 
-  renderRoom();
-  await updateCheckOutButton();
-  await checkForCheckOut();
-        await refreshCheckOutStatus();
+        renderRoom();
+        await updateCheckOutButton();
       } else {
         alert("❌ Lỗi khi lưu: " + result.message);
       }
@@ -901,54 +897,24 @@ async function checkForCheckOut() {
   if (checkOutBtn && availableBookings.length > 0) {
     checkOutBtn.disabled = false;
   }
+  if(availableBookings.length === 0) {
+    checkOutBtn.disabled = true;
+    document.getElementById("checkout-list").style.display = "none";
+    return;
+  }
+  showCheckOutList(availableBookings);
+  document.getElementById("checkout-list").style.display = "block";
 }
 document.addEventListener('DOMContentLoaded', () => {
-  const checkOutBtn = document.getElementById('checkOutBtn');
 
   if (checkOutBtn) {
     checkOutBtn.addEventListener('click', async () => {
       // ✅ Luôn cập nhật dữ liệu mới nhất mỗi lần click
       await checkForCheckOut();
-
-      const bookings = window.availableBookingsToday || [];
-      const listContainer = document.getElementById('checkout-list');
-      const ul = document.getElementById('checkout-booking-list');
-
-      if (!listContainer || !ul) return;
-
-      // ✅ Xoá danh sách cũ
-      ul.innerHTML = '';
-
-      // ✅ Kiểm tra và hiển thị danh sách đơn cần trả hôm nay
-      if (bookings.length > 0) {
-        bookings.forEach(booking => {
-          const li = document.createElement('li');
-          li.textContent = `Đơn: ${booking.Ma_don_dat_phong} - Trả: ${formatDate(booking.Ngay_tra)}`;
-          li.style.cursor = 'pointer';
-
-          // ✅ Gắn lại sự kiện mở danh sách chi tiết
-          li.addEventListener('click', () => {
-            showCheckOutList([booking]);
-            listContainer.style.display = 'block';
-            showFormWithDelay('checkout-list');
-          });
-
-          ul.appendChild(li);
-        });
-
-        listContainer.style.display = 'block';
-        showFormWithDelay('checkout-list');
-      } else {
-        listContainer.style.display = 'none';
-        alert("✅ Không còn đơn nào cần trả hôm nay.");
-      }
     });
   }
 
-  // ✅ Lần đầu tải trang vẫn cần chạy check trước
-  checkForCheckOut().then(() => {
-    console.log('Check out đang chạy lần đầu');
-  });
+  checkForCheckOut();
 });
 
 
@@ -1169,7 +1135,7 @@ async function delayBooking(bookedList) {
                           console.log("✔️ Đã cập nhật phòng về trạng thái 'Trống'");
                           //await fetchAllDataRoom(); // Refresh lại danh sách phòng
                           renderRoom();
-                          await refreshCheckOutStatus();
+                          //await refreshCheckOutStatus();
                           const updatedBookings = window.availableBookingsToday || [];
 
                           if (updatedBookings.length > 0) {

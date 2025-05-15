@@ -41,6 +41,8 @@
             justify-content: space-between;
             padding: 0 20px;
             margin-left: 220px;
+            position: relative;
+            z-index: 999;
         }
 
         .header .logo {
@@ -369,6 +371,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 999;
         }
         
         .logout-btn, .add-btn {
@@ -507,4 +511,12 @@
       width: 95%;
       left: 2.5%;
     }
+  }
+  #checkOutBtn {
+    position: relative;
+    z-index: 2;
+  }
+  #hotel-wrapper {
+    position: relative;
+    z-index: 1;
   }

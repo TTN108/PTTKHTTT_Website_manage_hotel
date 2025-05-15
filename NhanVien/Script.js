@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log(nhan_vien);
     bindStatusBarFilters();
 });
-setInterval(checkForCheckOut, 60000);
-setInterval(updateCheckOutButton, 60000);
+setInterval(checkForCheckOut, 21000);
+setInterval(updateCheckOutButton, 21000);
 function bindStatusBarFilters() {
   document.querySelectorAll('#status-bar .status-item').forEach(item => {
     item.addEventListener('click', function(e) {

@@ -58,6 +58,7 @@
                     <th>Username</th>
                     <th>Password</th>
                     <th>Email</th>
+                    <th>Tình trạng</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -143,8 +144,8 @@
             </div>
             <div>
                 <h3>Admin</h3>
-                <p>-Thêm, sửa, xóa tài khoản nhân viên</p>
-                <p>-Thêm, sửa, xóa tài khoản khách hàng</p>
+                <p>-Thêm, sửa, khóa, mở khóa tài khoản nhân viên</p>
+                <p>-Thêm, sửa, khóa, mở khóa tài khoản khách hàng</p>
             </div>
             <div>
                 <h3>Quản lý kho</h3>
